@@ -2,7 +2,7 @@
 
 namespace NServiceBus.FileBasedRouting
 {
-    class EndpointRoutingConfiguration
+    public class EndpointRoutingConfiguration
     {
         public string LogicalEndpointName { get; set; }
 

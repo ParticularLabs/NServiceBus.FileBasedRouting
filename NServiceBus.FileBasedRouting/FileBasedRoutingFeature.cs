@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using NServiceBus.Features;
@@ -20,7 +21,7 @@ namespace NServiceBus.FileBasedRouting
         protected override void Setup(FeatureConfigurationContext context)
         {
             var unicastRoutingTable = context.Settings.Get<UnicastRoutingTable>();
-            var routingFile = new XmlRoutingFile(context.Settings.Get<string>(RoutingFilePathKey));
+            var routingFile = new XmlRoutingFile(()=> File.OpenRead(context.Settings.Get<string>(RoutingFilePathKey)));
 
             // ensure the routing file is valid and the routing table is populated before running FeatureStartupTasks
             UpdateRoutingTable(routingFile, unicastRoutingTable);

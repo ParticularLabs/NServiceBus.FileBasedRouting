@@ -2,42 +2,83 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Schema;
 
 namespace NServiceBus.FileBasedRouting
 {
-    class XmlRoutingFile
+    public class XmlRoutingFile
     {
-        private readonly string filePath;
-
-        public XmlRoutingFile(string filePath)
+        public XmlRoutingFile(Func<Stream> streamAccessor)
         {
-            this.filePath = filePath;
+            this.streamAccessor = streamAccessor;
+
+            using (var stream = GetType().Assembly.GetManifestResourceStream("NServiceBus.FileBasedRouting.routing.xsd"))
+            using (var xmlReader = XmlReader.Create(stream))
+            {
+                schema = new XmlSchemaSet();
+                schema.Add("", xmlReader);
+            }
         }
 
         public IEnumerable<EndpointRoutingConfiguration> Read()
         {
-            using (var fileStream = File.OpenRead(filePath))
+            using (var stream = streamAccessor())
             {
-                var document = XDocument.Load(fileStream);
+                var document = XDocument.Load(stream);
+                document.Validate(schema, null, true);
+
                 var endpointElements = document.Root.Descendants("endpoint");
 
                 var configs = new List<EndpointRoutingConfiguration>();
                 foreach (var endpointElement in endpointElements)
                 {
-                    var config = new EndpointRoutingConfiguration();
-                    config.LogicalEndpointName = endpointElement.Attribute("name").Value;
+                    var config = new EndpointRoutingConfiguration
+                    {
+                        LogicalEndpointName = endpointElement.Attribute("name").Value
+                    };
 
-                    config.Commands = endpointElement.Element("handles")
-                        ?.Elements("command")
-                        .Select(e => Type.GetType(e.Attribute("type").Value, true))
-                        .ToArray() ?? new Type[0];
+                    var handles = endpointElement.Element("handles");
 
+                    var separatelyConfiguredCommands = handles
+                                             ?.Elements("command")
+                                             .Select(e => SelectCommand(e.Attribute("type").Value))
+                                             .ToArray() ?? Type.EmptyTypes;
+
+                    var filteredCommands = handles?.Elements("commands").SelectMany(SelectCommands) ?? Type.EmptyTypes;
+
+                    config.Commands = separatelyConfiguredCommands.Concat(filteredCommands).Distinct().ToArray();
                     configs.Add(config);
                 }
 
                 return configs;
             }
         }
+
+        static Type SelectCommand(string typeName)
+        {
+            return Type.GetType(typeName, true);
+        }
+
+        static IEnumerable<Type> SelectCommands(XElement commandsElement)
+        {
+            var assemblyName = commandsElement.Attribute("assembly").Value;
+            var assembly = Assembly.Load(assemblyName);
+            var exportedTypes = assembly.ExportedTypes;
+            var @namespace = commandsElement.Attribute("namespace");
+            if (@namespace == null)
+            {
+                return exportedTypes;
+            }
+            return
+                exportedTypes.Where(
+                    type => type.Namespace != null && type.Namespace.StartsWith(@namespace.Value));
+        }
+
+
+        readonly Func<Stream> streamAccessor;
+        readonly XmlSchemaSet schema;
     }
 }
