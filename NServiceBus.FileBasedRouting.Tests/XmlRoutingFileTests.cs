@@ -1,6 +1,5 @@
-﻿using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
+using System.Xml.Linq;
 using NServiceBus.FileBasedRouting.Tests.Contracts;
 using NServiceBus.FileBasedRouting.Tests.Contracts.Commands;
 using NUnit.Framework;
@@ -73,21 +72,36 @@ namespace NServiceBus.FileBasedRouting.Tests
             CollectionAssert.AreEquivalent(new[] { typeof(A), typeof(B) }, configuration.Commands);
         }
 
+        [Test]
+        public void It_provides_distinct_result_even_when_types_are_registered_multiple_times()
+        {
+            const string xml = @"
+ <endpoints>
+  <endpoint name=""EndpointName"">
+    <handles>
+      <command type = ""NServiceBus.FileBasedRouting.Tests.Contracts.Commands.A, NServiceBus.FileBasedRouting.Tests.Contracts"" />
+      <command type = ""NServiceBus.FileBasedRouting.Tests.Contracts.Commands.A, NServiceBus.FileBasedRouting.Tests.Contracts"" />
+      <command type = ""NServiceBus.FileBasedRouting.Tests.Contracts.Commands.B, NServiceBus.FileBasedRouting.Tests.Contracts"" />
+      <command type = ""NServiceBus.FileBasedRouting.Tests.Contracts.Commands.B, NServiceBus.FileBasedRouting.Tests.Contracts"" />
+      <commands assembly = ""NServiceBus.FileBasedRouting.Tests.Contracts"" namespace=""NServiceBus.FileBasedRouting.Tests.Contracts.Commands"" />
+      <commands assembly = ""NServiceBus.FileBasedRouting.Tests.Contracts"" namespace=""NServiceBus.FileBasedRouting.Tests.Contracts.Commands"" />
+    </handles>
+  </endpoint>
+ </endpoints>
+ ";
+            var configurations = GetConfigurations(xml);
+
+            Assert.AreEqual(1, configurations.Length);
+            var configuration = configurations[0];
+            Assert.AreEqual("EndpointName", configuration.LogicalEndpointName);
+
+            CollectionAssert.AreEquivalent(new[] { typeof(A), typeof(B) }, configuration.Commands);
+        }
+
 
         static EndpointRoutingConfiguration[] GetConfigurations(string xml)
         {
-            var result = new XmlRoutingFile(() =>
-            {
-                var ms = new MemoryStream();
-                using (var writer = new StreamWriter(ms, Encoding.UTF8, 1024, true))
-                {
-                    writer.Write(xml);
-                    writer.Flush();
-                }
-                ms.Seek(0, SeekOrigin.Begin);
-                return ms;
-            });
-
+            var result = new XmlRoutingFileParser(XDocument.Parse(xml));
             return result.Read().ToArray();
         }
     }
