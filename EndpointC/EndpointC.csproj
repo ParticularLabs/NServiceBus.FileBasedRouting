@@ -4,14 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9B21E30F-61C0-4404-BB18-88CEBC69122C}</ProjectGuid>
+    <ProjectGuid>{A1595C02-E64F-4DAF-A535-A043E4EB641A}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EndpointB_2</RootNamespace>
-    <AssemblyName>EndpointB_2</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <RootNamespace>EndpointC</RootNamespace>
+    <AssemblyName>EndpointC</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,6 +48,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DemoCommandHandler.cs" />
+    <Compile Include="DemoEventHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -59,18 +62,7 @@
       <Project>{fb64c215-540a-4ed1-901f-1e0a242d0908}</Project>
       <Name>Contracts</Name>
     </ProjectReference>
-    <ProjectReference Include="..\NServiceBus.FileBasedRouting\NServiceBus.FileBasedRouting.csproj">
-      <Project>{b6417ca5-3892-4c53-8356-31018692ae35}</Project>
-      <Name>NServiceBus.FileBasedRouting</Name>
-    </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\EndpointA\endpoints.xml">
-      <Link>endpoints.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <Import Project="..\EndpointB\EndpointB.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
