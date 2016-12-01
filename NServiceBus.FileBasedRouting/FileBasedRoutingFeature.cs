@@ -7,6 +7,7 @@ using System.Xml;
 using System.Xml.Linq;
 using NServiceBus.Features;
 using NServiceBus.Routing;
+using NServiceBus.Transport;
 
 namespace NServiceBus.FileBasedRouting
 {
@@ -35,6 +36,22 @@ namespace NServiceBus.FileBasedRouting
             UpdateRoutingTable(routingFile, unicastRoutingTable);
 
             context.RegisterStartupTask(new UpdateRoutingTask(routingFile, unicastRoutingTable));
+
+            // if the transport provides native pub/sub support, don't plug in the FileBased pub/sub storage.
+            if (context.Settings.Get<TransportInfrastructure>().OutboundRoutingPolicy.Publishes == OutboundRoutingType.Unicast)
+            {
+                var transportInfrastructure = context.Settings.Get<TransportInfrastructure>();
+                PublishRoutingConnector routingConnector = new PublishRoutingConnector(
+                    routingTable,
+                    context.Settings.Get<EndpointInstances>(),
+                    context.Settings.Get<DistributionPolicy>(),
+                    instance => transportInfrastructure.ToTransportAddress(LogicalAddress.CreateRemoteAddress(instance)));
+
+                context.Pipeline.Register(routingConnector, "routes published events");
+                context.Pipeline.Register(new SubscribeTerminator(), "handles subscribe operations");
+                context.Pipeline.Register(new UnsubscribeTerminator(), "handles ubsubscribe operations");
+
+            }
         }
 
         private static void UpdateRoutingTable(XmlRoutingFileParser routingFileParser, UnicastRoutingTable unicastRoutingTable)
