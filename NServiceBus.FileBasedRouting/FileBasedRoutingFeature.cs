@@ -29,15 +29,15 @@ namespace NServiceBus.FileBasedRouting
                 document = XDocument.Load(fileStream);
             }
 
-            var routingFile = new XmlRoutingFileParser(document);
+            var routingFileParser = new XmlRoutingFileParser(document);
 
             // ensure the routing file is valid and the routing table is populated before running FeatureStartupTasks
-            UpdateRoutingTable(routingFile, routing.Sending, routing.Publishing);
+            UpdateRoutingTable(routingFileParser, routing.Sending, routing.Publishing);
 
-            context.RegisterStartupTask(new UpdateRoutingTask(routingFile, routing.Sending, routing.Publishing));
+            context.RegisterStartupTask(new UpdateRoutingTask(routingFileParser, routing.Sending, routing.Publishing));
         }
 
-        private static void UpdateRoutingTable(XmlRoutingFile routingFile, UnicastRoutingTable unicastRoutingTable, UnicastSubscriberTable subscriberTable)
+        private static void UpdateRoutingTable(XmlRoutingFileParser routingFileParser, UnicastRoutingTable unicastRoutingTable, UnicastSubscriberTable subscriberTable)
         {
             var endpoints = routingFileParser.Read();
 
@@ -68,7 +68,7 @@ namespace NServiceBus.FileBasedRouting
             private readonly UnicastSubscriberTable subscriberTable;
             private Timer updateTimer;
 
-            public UpdateRoutingTask(XmlRoutingFile routingFile, UnicastRoutingTable unicastRoutingTable, UnicastSubscriberTable subscriberTable)
+            public UpdateRoutingTask(XmlRoutingFileParser routingFileParser, UnicastRoutingTable unicastRoutingTable, UnicastSubscriberTable subscriberTable)
             {
                 this.routingFileParser = routingFileParser;
                 this.unicastRoutingTable = unicastRoutingTable;
@@ -77,7 +77,7 @@ namespace NServiceBus.FileBasedRouting
 
             protected override Task OnStart(IMessageSession session)
             {
-                updateTimer = new Timer(state => UpdateRoutingTable(routingFile, unicastRoutingTable, subscriberTable), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+                updateTimer = new Timer(state => UpdateRoutingTable(routingFileParser, unicastRoutingTable, subscriberTable), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
 
                 return Task.CompletedTask;
             }
