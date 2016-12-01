@@ -17,6 +17,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndpointB_1", "EndpointB_1\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndpointB_2", "EndpointB_2\EndpointB_2.csproj", "{9B21E30F-61C0-4404-BB18-88CEBC69122C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.FileBasedRouting.Tests", "NServiceBus.FileBasedRouting.Tests\NServiceBus.FileBasedRouting.Tests.csproj", "{01B5FB13-9952-4537-A340-42706EA66019}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NServiceBus.FileBasedRouting.Tests.Contracts", "NServiceBus.FileBasedRouting.Tests.Contracts\NServiceBus.FileBasedRouting.Tests.Contracts.csproj", "{88F2D59F-CE5D-4BD5-B9EB-494A2728AD98}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		EndpointB\EndpointB.projitems*{54093e78-eb7c-46e5-b495-3d6198eafa5c}*SharedItemsImports = 13
@@ -48,6 +52,14 @@ Global
 		{9B21E30F-61C0-4404-BB18-88CEBC69122C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B21E30F-61C0-4404-BB18-88CEBC69122C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B21E30F-61C0-4404-BB18-88CEBC69122C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{01B5FB13-9952-4537-A340-42706EA66019}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{01B5FB13-9952-4537-A340-42706EA66019}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{01B5FB13-9952-4537-A340-42706EA66019}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{01B5FB13-9952-4537-A340-42706EA66019}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88F2D59F-CE5D-4BD5-B9EB-494A2728AD98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88F2D59F-CE5D-4BD5-B9EB-494A2728AD98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88F2D59F-CE5D-4BD5-B9EB-494A2728AD98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88F2D59F-CE5D-4BD5-B9EB-494A2728AD98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
