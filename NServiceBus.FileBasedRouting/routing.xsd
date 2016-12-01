@@ -5,7 +5,7 @@
         <xs:element minOccurs="0" maxOccurs="unbounded" name="endpoint">
           <xs:complexType>
             <xs:sequence>
-              <xs:element maxOccurs="1" name="handles">
+              <xs:element minOccurs="0" maxOccurs="1" name="handles">
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element minOccurs="0" maxOccurs="unbounded" name="command">
