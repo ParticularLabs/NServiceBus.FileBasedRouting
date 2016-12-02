@@ -39,18 +39,24 @@ namespace NServiceBus.FileBasedRouting
 
                 var handles = endpointElement.Element("handles");
 
-                var separatelyConfiguredCommands = handles
-                                                       ?.Elements("command")
-                                                       .Select(e => SelectCommand(e.Attribute("type").Value))
-                                                       .ToArray() ?? Type.EmptyTypes;
-
-                var filteredCommands = handles?.Elements("commands").SelectMany(SelectCommands) ?? Type.EmptyTypes;
-
-                config.Commands = separatelyConfiguredCommands.Concat(filteredCommands).Distinct().ToArray();
+                config.Commands = GetAllMessages(handles, "command", "commands").ToArray();
+                config.Events = GetAllMessages(handles, "event", "events").ToArray();
                 configs.Add(config);
             }
 
             return configs;
+        }
+
+        static IEnumerable<Type> GetAllMessages(XElement handles, string singularElementName, string pluralElementName)
+        {
+            var separatelyConfiguredCommands = handles
+                ?.Elements(singularElementName)
+                .Select(e => SelectCommand(e.Attribute("type").Value))
+                .ToArray() ?? Type.EmptyTypes;
+
+            var filteredCommands = handles?.Elements(pluralElementName).SelectMany(SelectMessages) ?? Type.EmptyTypes;
+            var allCommands = separatelyConfiguredCommands.Concat(filteredCommands).Distinct();
+            return allCommands;
         }
 
         static Type SelectCommand(string typeName)
@@ -58,7 +64,7 @@ namespace NServiceBus.FileBasedRouting
             return Type.GetType(typeName, true);
         }
 
-        static IEnumerable<Type> SelectCommands(XElement commandsElement)
+        static IEnumerable<Type> SelectMessages(XElement commandsElement)
         {
             var assemblyName = commandsElement.Attribute("assembly").Value;
             var assembly = Assembly.Load(assemblyName);
