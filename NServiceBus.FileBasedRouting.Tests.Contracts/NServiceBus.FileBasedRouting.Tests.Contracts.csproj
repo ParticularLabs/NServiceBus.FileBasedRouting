@@ -41,8 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="C.cs" />
-    <Compile Include="Namespace\A.cs" />
-    <Compile Include="Namespace\B.cs" />
+    <Compile Include="Commands\A.cs" />
+    <Compile Include="Commands\B.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
