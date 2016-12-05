@@ -22,26 +22,27 @@ namespace NServiceBus.FileBasedRouting
 
         protected override void Setup(FeatureConfigurationContext context)
         {
-            var unicastRoutingTable = context.Settings.Get<UnicastRoutingTable>();
+            var routing = context.Settings.Get<IRoutingComponent>();
             XDocument document;
             using (var fileStream = File.OpenRead(context.Settings.Get<string>(RoutingFilePathKey)))
             {
                 document = XDocument.Load(fileStream);
             }
 
-            var routingFile = new XmlRoutingFileParser(document);
+            var routingFileParser = new XmlRoutingFileParser(document);
 
             // ensure the routing file is valid and the routing table is populated before running FeatureStartupTasks
-            UpdateRoutingTable(routingFile, unicastRoutingTable);
+            UpdateRoutingTable(routingFileParser, routing.Sending, routing.Publishing);
 
-            context.RegisterStartupTask(new UpdateRoutingTask(routingFile, unicastRoutingTable));
+            context.RegisterStartupTask(new UpdateRoutingTask(routingFileParser, routing.Sending, routing.Publishing));
         }
 
-        private static void UpdateRoutingTable(XmlRoutingFileParser routingFileParser, UnicastRoutingTable unicastRoutingTable)
+        private static void UpdateRoutingTable(XmlRoutingFileParser routingFileParser, UnicastRoutingTable unicastRoutingTable, UnicastSubscriberTable subscriberTable)
         {
             var endpoints = routingFileParser.Read();
 
             var commandRoutes = new List<RouteTableEntry>();
+            var eventRoutes = new List<RouteTableEntry>();
             foreach (var endpoint in endpoints)
             {
                 foreach (var command in endpoint.Commands)
@@ -49,26 +50,34 @@ namespace NServiceBus.FileBasedRouting
                     commandRoutes.Add(new RouteTableEntry(command,
                         UnicastRoute.CreateFromEndpointName(endpoint.LogicalEndpointName)));
                 }
+                foreach (var @event in endpoint.Events)
+                {
+                    eventRoutes.Add(new RouteTableEntry(@event,
+                        UnicastRoute.CreateFromEndpointName(endpoint.LogicalEndpointName)));
+                }
             }
 
             unicastRoutingTable.AddOrReplaceRoutes("FileBasedRouting", commandRoutes);
+            subscriberTable.AddOrReplaceRoutes("FiledBasedRouting", eventRoutes);
         }
 
         class UpdateRoutingTask : FeatureStartupTask, IDisposable
         {
             private readonly XmlRoutingFileParser routingFileParser;
             private readonly UnicastRoutingTable unicastRoutingTable;
+            private readonly UnicastSubscriberTable subscriberTable;
             private Timer updateTimer;
 
-            public UpdateRoutingTask(XmlRoutingFileParser routingFileParser, UnicastRoutingTable unicastRoutingTable)
+            public UpdateRoutingTask(XmlRoutingFileParser routingFileParser, UnicastRoutingTable unicastRoutingTable, UnicastSubscriberTable subscriberTable)
             {
                 this.routingFileParser = routingFileParser;
                 this.unicastRoutingTable = unicastRoutingTable;
+                this.subscriberTable = subscriberTable;
             }
 
             protected override Task OnStart(IMessageSession session)
             {
-                updateTimer = new Timer(state => UpdateRoutingTable(routingFileParser, unicastRoutingTable), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+                updateTimer = new Timer(state => UpdateRoutingTable(routingFileParser, unicastRoutingTable, subscriberTable), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
 
                 return Task.CompletedTask;
             }

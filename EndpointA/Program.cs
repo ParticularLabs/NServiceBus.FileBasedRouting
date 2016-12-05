@@ -27,7 +27,7 @@ namespace EndpointA
             endpointConfiguration.SendFailedMessagesTo("error");
 
             var routingConfig = endpointConfiguration.UseTransport<MsmqTransport>().Routing();
-            routingConfig.RegisterPublisher(typeof(DemoCommandReceived), "endpointB");
+            routingConfig.RegisterPublisher(typeof(DemoCommandReceived), "endpointC");
             routingConfig.InstanceMappingFile().FilePath("instance-mapping.xml");
 
             endpointConfiguration.EnableFeature<FileBasedRoutingFeature>();
@@ -48,8 +48,9 @@ namespace EndpointA
                 {
                     var commandId = Guid.NewGuid();
                     await endpoint.Send(new DemoCommand { CommandId = commandId });
+                    await endpoint.Send(new OtherCommand { CommandId = commandId });
                     Console.WriteLine();
-                    Console.WriteLine("Sent command with id: " + commandId);
+                    Console.WriteLine("Sent commands with id: " + commandId);
                 }
 
                 if (key.Key == ConsoleKey.E)
