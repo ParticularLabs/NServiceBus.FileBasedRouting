@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
 using NServiceBus.Features;
 using NServiceBus.Routing;
@@ -18,74 +17,87 @@ namespace NServiceBus.FileBasedRouting
         public FileBasedRoutingFeature()
         {
             Defaults(s =>
-                s.SetDefault(RoutingFilePathKey, "endpoints.xml"));
+            {
+                s.SetDefault(RoutingFilePathKey, "endpoints.xml");
+                s.SetDefault<UnicastSubscriberTable>(new UnicastSubscriberTable());
+            });
         }
 
         protected override void Setup(FeatureConfigurationContext context)
         {
             var unicastRoutingTable = context.Settings.Get<UnicastRoutingTable>();
+            var unicastSubscriberTable = context.Settings.Get<UnicastSubscriberTable>();
             XDocument document;
             using (var fileStream = File.OpenRead(context.Settings.Get<string>(RoutingFilePathKey)))
             {
                 document = XDocument.Load(fileStream);
             }
 
-            var routingFile = new XmlRoutingFileParser(document);
+            var routingFileParser = new XmlRoutingFileParser(document);
 
             // ensure the routing file is valid and the routing table is populated before running FeatureStartupTasks
-            UpdateRoutingTable(routingFile, unicastRoutingTable);
+            UpdateRoutingTable(routingFileParser, unicastRoutingTable, unicastSubscriberTable);
 
-            context.RegisterStartupTask(new UpdateRoutingTask(routingFile, unicastRoutingTable));
+            context.RegisterStartupTask(new UpdateRoutingTask(routingFileParser, unicastRoutingTable, unicastSubscriberTable));
 
             // if the transport provides native pub/sub support, don't plug in the FileBased pub/sub storage.
             if (context.Settings.Get<TransportInfrastructure>().OutboundRoutingPolicy.Publishes == OutboundRoutingType.Unicast)
             {
                 var transportInfrastructure = context.Settings.Get<TransportInfrastructure>();
-                PublishRoutingConnector routingConnector = new PublishRoutingConnector(
-                    routingTable,
+                var routingConnector = new PublishRoutingConnector(
+                    unicastSubscriberTable,
                     context.Settings.Get<EndpointInstances>(),
                     context.Settings.Get<DistributionPolicy>(),
                     instance => transportInfrastructure.ToTransportAddress(LogicalAddress.CreateRemoteAddress(instance)));
 
-                context.Pipeline.Register(routingConnector, "routes published events");
-                context.Pipeline.Register(new SubscribeTerminator(), "handles subscribe operations");
-                context.Pipeline.Register(new UnsubscribeTerminator(), "handles ubsubscribe operations");
+                context.Pipeline.Replace("UnicastPublishRouterConnector", routingConnector);
+                context.Pipeline.Replace("MessageDrivenSubscribeTerminator", new SubscribeTerminator(), "handles subscribe operations");
+                context.Pipeline.Replace("MessageDrivenUnsubscribeTerminator", new UnsubscribeTerminator(), "handles ubsubscribe operations");
 
             }
         }
 
-        private static void UpdateRoutingTable(XmlRoutingFileParser routingFileParser, UnicastRoutingTable unicastRoutingTable)
+        private static void UpdateRoutingTable(XmlRoutingFileParser routingFileParser, UnicastRoutingTable routingTable, UnicastSubscriberTable subscriberTable)
         {
             var endpoints = routingFileParser.Read();
 
             var commandRoutes = new List<RouteTableEntry>();
+            var eventRoutes = new List<RouteTableEntry>();
+
             foreach (var endpoint in endpoints)
             {
-                foreach (var command in endpoint.Commands)
+                foreach (var commandType in endpoint.Commands)
                 {
-                    commandRoutes.Add(new RouteTableEntry(command,
-                        UnicastRoute.CreateFromEndpointName(endpoint.LogicalEndpointName)));
+                    commandRoutes.Add(new RouteTableEntry(commandType, UnicastRoute.CreateFromEndpointName(endpoint.LogicalEndpointName)));
+                }
+
+                foreach (var eventType in endpoint.Events)
+                {
+                    eventRoutes.Add(new RouteTableEntry(eventType, UnicastRoute.CreateFromEndpointName(endpoint.LogicalEndpointName)));
                 }
             }
 
-            unicastRoutingTable.AddOrReplaceRoutes("FileBasedRouting", commandRoutes);
+            routingTable.AddOrReplaceRoutes("FileBasedRouting", commandRoutes);
+            subscriberTable.AddOrReplaceRoutes("FileBasedRouting", eventRoutes);
         }
 
         class UpdateRoutingTask : FeatureStartupTask, IDisposable
         {
-            private readonly XmlRoutingFileParser routingFileParser;
-            private readonly UnicastRoutingTable unicastRoutingTable;
-            private Timer updateTimer;
+            XmlRoutingFileParser routingFileParser;
+            UnicastRoutingTable unicastRoutingTable;
+            UnicastSubscriberTable subscriberTable;
+            Timer updateTimer;
 
-            public UpdateRoutingTask(XmlRoutingFileParser routingFileParser, UnicastRoutingTable unicastRoutingTable)
+            public UpdateRoutingTask(XmlRoutingFileParser routingFileParser, UnicastRoutingTable unicastRoutingTable, UnicastSubscriberTable subscriberTable)
             {
                 this.routingFileParser = routingFileParser;
                 this.unicastRoutingTable = unicastRoutingTable;
+                this.subscriberTable = subscriberTable;
             }
 
             protected override Task OnStart(IMessageSession session)
             {
-                updateTimer = new Timer(state => UpdateRoutingTable(routingFileParser, unicastRoutingTable), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+                updateTimer = new Timer(state => UpdateRoutingTable(routingFileParser, unicastRoutingTable, subscriberTable), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
 
                 return Task.CompletedTask;
             }
