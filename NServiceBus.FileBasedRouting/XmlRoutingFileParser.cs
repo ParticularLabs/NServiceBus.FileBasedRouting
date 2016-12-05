@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
@@ -37,20 +36,26 @@ namespace NServiceBus.FileBasedRouting
                     LogicalEndpointName = endpointElement.Attribute("name").Value
                 };
 
-                var handles = endpointElement.Element("handles");
-
-                var separatelyConfiguredCommands = handles
-                                                       ?.Elements("command")
-                                                       .Select(e => SelectCommand(e.Attribute("type").Value))
-                                                       .ToArray() ?? Type.EmptyTypes;
-
-                var filteredCommands = handles?.Elements("commands").SelectMany(SelectCommands) ?? Type.EmptyTypes;
-
-                config.Commands = separatelyConfiguredCommands.Concat(filteredCommands).Distinct().ToArray();
+                config.Commands = GetAllMessageTypes(endpointElement, "command", "commands").ToArray();
+                config.Events = GetAllMessageTypes(endpointElement, "event", "events").ToArray();
                 configs.Add(config);
             }
 
             return configs;
+        }
+
+        static IEnumerable<Type> GetAllMessageTypes(XElement endpointElement, string singular, string plural)
+        {
+            var handles = endpointElement.Element("handles");
+
+            var separatelyConfiguredCommands = handles
+                ?.Elements(singular)
+                .Select(e => SelectCommand(e.Attribute("type").Value))
+                .ToArray() ?? Type.EmptyTypes;
+
+            var filteredCommands = handles?.Elements(plural).SelectMany(SelectMessages) ?? Type.EmptyTypes;
+            var allCommands = separatelyConfiguredCommands.Concat(filteredCommands).Distinct();
+            return allCommands;
         }
 
         static Type SelectCommand(string typeName)
@@ -58,7 +63,7 @@ namespace NServiceBus.FileBasedRouting
             return Type.GetType(typeName, true);
         }
 
-        static IEnumerable<Type> SelectCommands(XElement commandsElement)
+        static IEnumerable<Type> SelectMessages(XElement commandsElement)
         {
             var assemblyName = commandsElement.Attribute("assembly").Value;
             var assembly = Assembly.Load(assemblyName);

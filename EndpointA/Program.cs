@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Contracts.Commands;
 using Contracts.Events;
 using NServiceBus;
-using NServiceBus.Features;
 using NServiceBus.FileBasedRouting;
-using NServiceBus.Persistence;
 
 namespace EndpointA
 {
