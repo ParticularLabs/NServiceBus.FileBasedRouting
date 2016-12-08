@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 using NServiceBus.Features;
 using NServiceBus.Routing;
 using NServiceBus.Transport;
@@ -27,18 +25,14 @@ namespace NServiceBus.FileBasedRouting
         {
             var unicastRoutingTable = context.Settings.Get<UnicastRoutingTable>();
             var unicastSubscriberTable = context.Settings.Get<UnicastSubscriberTable>();
-            XDocument document;
-            using (var fileStream = File.OpenRead(context.Settings.Get<string>(RoutingFilePathKey)))
-            {
-                document = XDocument.Load(fileStream);
-            }
 
-            var routingFileParser = new XmlRoutingFileParser(document);
+            var routingFile = new XmlRoutingFileAccess(context.Settings.Get<string>(RoutingFilePathKey));
+            var routingFileParser = new XmlRoutingFileParser();
 
             // ensure the routing file is valid and the routing table is populated before running FeatureStartupTasks
-            UpdateRoutingTable(routingFileParser, unicastRoutingTable, unicastSubscriberTable);
+            UpdateRoutingTable(routingFileParser, routingFile, unicastRoutingTable, unicastSubscriberTable);
 
-            context.RegisterStartupTask(new UpdateRoutingTask(routingFileParser, unicastRoutingTable, unicastSubscriberTable));
+            context.RegisterStartupTask(new UpdateRoutingTask(routingFileParser, routingFile, unicastRoutingTable, unicastSubscriberTable));
 
             // if the transport provides native pub/sub support, don't plug in the FileBased pub/sub storage.
             if (context.Settings.Get<TransportInfrastructure>().OutboundRoutingPolicy.Publishes == OutboundRoutingType.Unicast)
@@ -57,9 +51,9 @@ namespace NServiceBus.FileBasedRouting
             }
         }
 
-        private static void UpdateRoutingTable(XmlRoutingFileParser routingFileParser, UnicastRoutingTable routingTable, UnicastSubscriberTable subscriberTable)
+        static void UpdateRoutingTable(XmlRoutingFileParser routingFileParser, XmlRoutingFileAccess routingFile, UnicastRoutingTable routingTable, UnicastSubscriberTable subscriberTable)
         {
-            var endpoints = routingFileParser.Read();
+            var endpoints = routingFileParser.Parse(routingFile.Read());
 
             var commandRoutes = new List<RouteTableEntry>();
             var eventRoutes = new List<RouteTableEntry>();
@@ -84,20 +78,22 @@ namespace NServiceBus.FileBasedRouting
         class UpdateRoutingTask : FeatureStartupTask, IDisposable
         {
             XmlRoutingFileParser routingFileParser;
+            XmlRoutingFileAccess routingFile;
             UnicastRoutingTable unicastRoutingTable;
             UnicastSubscriberTable subscriberTable;
             Timer updateTimer;
 
-            public UpdateRoutingTask(XmlRoutingFileParser routingFileParser, UnicastRoutingTable unicastRoutingTable, UnicastSubscriberTable subscriberTable)
+            public UpdateRoutingTask(XmlRoutingFileParser routingFileParser, XmlRoutingFileAccess routingFile, UnicastRoutingTable unicastRoutingTable, UnicastSubscriberTable subscriberTable)
             {
                 this.routingFileParser = routingFileParser;
+                this.routingFile = routingFile;
                 this.unicastRoutingTable = unicastRoutingTable;
                 this.subscriberTable = subscriberTable;
             }
 
             protected override Task OnStart(IMessageSession session)
             {
-                updateTimer = new Timer(state => UpdateRoutingTable(routingFileParser, unicastRoutingTable, subscriberTable), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+                updateTimer = new Timer(state => UpdateRoutingTable(routingFileParser, routingFile, unicastRoutingTable, subscriberTable), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
 
                 return Task.CompletedTask;
             }

@@ -10,10 +10,8 @@ namespace NServiceBus.FileBasedRouting
 {
     public class XmlRoutingFileParser
     {
-        public XmlRoutingFileParser(XDocument document)
+        public XmlRoutingFileParser()
         {
-            this.document = document;
-
             using (var stream = GetType().Assembly.GetManifestResourceStream("NServiceBus.FileBasedRouting.routing.xsd"))
             using (var xmlReader = XmlReader.Create(stream))
             {
@@ -22,7 +20,7 @@ namespace NServiceBus.FileBasedRouting
             }
         }
 
-        public IEnumerable<EndpointRoutingConfiguration> Read()
+        public IEnumerable<EndpointRoutingConfiguration> Parse(XDocument document)
         {
             document.Validate(schema, null, true);
 
@@ -83,8 +81,6 @@ namespace NServiceBus.FileBasedRouting
 
             return exportedTypes.Where(type => type.Namespace != null && type.Namespace.StartsWith(@namespace.Value));
         }
-
-        readonly XDocument document;
         readonly XmlSchemaSet schema;
     }
 }

@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="XmlRoutingFileAccess.cs" />
     <Compile Include="UnicastRouteGroup.cs" />
     <Compile Include="EndpointRoutingConfiguration.cs" />
     <Compile Include="FileBasedRoutingFeature.cs" />
