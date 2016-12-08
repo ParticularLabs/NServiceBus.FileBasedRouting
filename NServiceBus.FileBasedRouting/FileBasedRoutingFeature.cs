@@ -8,6 +8,8 @@ using NServiceBus.Transport;
 
 namespace NServiceBus.FileBasedRouting
 {
+    using System.IO;
+
     public class FileBasedRoutingFeature : Feature
     {
         const string RoutingFilePathKey = "NServiceBus.FileBasedRouting.RoutingFilePath";
@@ -26,7 +28,8 @@ namespace NServiceBus.FileBasedRouting
             var unicastRoutingTable = context.Settings.Get<UnicastRoutingTable>();
             var unicastSubscriberTable = context.Settings.Get<UnicastSubscriberTable>();
 
-            var routingFile = new XmlRoutingFileAccess(context.Settings.Get<string>(RoutingFilePathKey));
+            var routingFilePath = GetRoutingFilePath(context);
+            var routingFile = new XmlRoutingFileAccess(routingFilePath);
             var routingFileParser = new XmlRoutingFileParser();
 
             // ensure the routing file is valid and the routing table is populated before running FeatureStartupTasks
@@ -49,6 +52,12 @@ namespace NServiceBus.FileBasedRouting
                 context.Pipeline.Replace("MessageDrivenUnsubscribeTerminator", new UnsubscribeTerminator(), "handles ubsubscribe operations");
 
             }
+        }
+
+        static string GetRoutingFilePath(FeatureConfigurationContext context)
+        {
+            var configuredRoutingFilePath = context.Settings.Get<string>(RoutingFilePathKey);
+            return Path.IsPathRooted(configuredRoutingFilePath) ? configuredRoutingFilePath : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configuredRoutingFilePath);
         }
 
         static void UpdateRoutingTable(XmlRoutingFileParser routingFileParser, XmlRoutingFileAccess routingFile, UnicastRoutingTable routingTable, UnicastSubscriberTable subscriberTable)
