@@ -1,11 +1,12 @@
 ﻿using System.Linq;
-using System.Xml.Linq;
 using NServiceBus.FileBasedRouting.Tests.Contracts;
 using NServiceBus.FileBasedRouting.Tests.Contracts.Commands;
 using NUnit.Framework;
 
 namespace NServiceBus.FileBasedRouting.Tests
 {
+    using System.Xml.Linq;
+
     public class XmlRoutingFileTests
     {
         [Test]
@@ -122,8 +123,8 @@ namespace NServiceBus.FileBasedRouting.Tests
 
         static EndpointRoutingConfiguration[] GetConfigurations(string xml)
         {
-            var result = new XmlRoutingFileParser(XDocument.Parse(xml));
-            return result.Read().ToArray();
+            var result = new XmlRoutingFileParser();
+            return result.Parse(XDocument.Parse(xml)).ToArray();
         }
     }
 }
