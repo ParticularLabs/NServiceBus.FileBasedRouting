@@ -48,7 +48,7 @@ namespace NServiceBus.FileBasedRouting.Tests
             var configuration = configurations[0];
             Assert.AreEqual("EndpointName", configuration.LogicalEndpointName);
 
-            CollectionAssert.AreEquivalent(new[] { typeof(A), typeof(B), typeof(C) }, configuration.Commands);
+            CollectionAssert.AreEquivalent(new[] { typeof(A), typeof(B), typeof(C), typeof(D) }, configuration.Commands);
         }
 
         [Test]
@@ -70,6 +70,27 @@ namespace NServiceBus.FileBasedRouting.Tests
             Assert.AreEqual("EndpointName", configuration.LogicalEndpointName);
 
             CollectionAssert.AreEquivalent(new[] { typeof(A), typeof(B) }, configuration.Commands);
+        }
+
+        [Test]
+        public void It_can_parse_file_with_commands_with_assembly_and_empty_namespace()
+        {
+            const string xml = @"
+ <endpoints>
+  <endpoint name=""EndpointName"">
+    <handles>
+      <commands assembly = ""NServiceBus.FileBasedRouting.Tests.Contracts"" namespace="""" />
+    </handles>
+  </endpoint>
+ </endpoints>
+ ";
+            var configurations = GetConfigurations(xml);
+
+            Assert.AreEqual(1, configurations.Length);
+            var configuration = configurations[0];
+            Assert.AreEqual("EndpointName", configuration.LogicalEndpointName);
+
+            CollectionAssert.AreEquivalent(new[] { typeof(D) }, configuration.Commands);
         }
 
         [Test]

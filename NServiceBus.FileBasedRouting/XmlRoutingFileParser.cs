@@ -68,11 +68,16 @@ namespace NServiceBus.FileBasedRouting
             {
                 return exportedTypes;
             }
-            return
-                exportedTypes.Where(
-                    type => type.Namespace != null && type.Namespace.StartsWith(@namespace.Value));
-        }
 
+            // the namespace attribute exists, but it's empty
+            if (string.IsNullOrEmpty(@namespace.Value))
+            {
+                // return only types with no namespace at all
+                return exportedTypes.Where(type => string.IsNullOrEmpty(type.Namespace));
+            }
+
+            return exportedTypes.Where(type => type.Namespace != null && type.Namespace.StartsWith(@namespace.Value));
+        }
 
         readonly XDocument document;
         readonly XmlSchemaSet schema;
