@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Contracts.Events;
 using NServiceBus;
-using NServiceBus.Features;
 using NServiceBus.FileBasedRouting;
-using NServiceBus.Persistence;
 
 namespace EndpointB
 {
@@ -23,8 +19,7 @@ namespace EndpointB
             var routingConfig = endpointConfiguration.UseTransport<MsmqTransport>().Routing();
             routingConfig.RegisterPublisher(typeof(DemoEvent), "endpointA");
 
-            //not used yet
-            //endpointConfiguration.EnableFeature<FileBasedRoutingFeature>();
+            endpointConfiguration.EnableFileBasedRouting();
 
             var endpoint = await Endpoint.Start(endpointConfiguration);
 

@@ -89,7 +89,7 @@ namespace NServiceBus.FileBasedRouting.Tests
         static IDisposable Use(string fileName, string xml)
         {
             // the feature uses the relative path
-            var file = fileName;
+            var file = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
             File.WriteAllText(file, xml);
 
             return new Disposable(() => File.Delete(file));
