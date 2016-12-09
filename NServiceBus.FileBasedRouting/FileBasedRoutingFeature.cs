@@ -3,21 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml;
 using System.Xml.Linq;
 using NServiceBus.Features;
 using NServiceBus.Routing;
 
 namespace NServiceBus.FileBasedRouting
 {
-    public class FileBasedRoutingFeature : Feature
+    class FileBasedRoutingFeature : Feature
     {
-        const string RoutingFilePathKey = "NServiceBus.FileBasedRouting.RoutingFilePath";
+        public const string RoutingFilePathKey = "NServiceBus.FileBasedRouting.RoutingFilePath";
 
         public FileBasedRoutingFeature()
         {
-            Defaults(s =>
-                s.SetDefault(RoutingFilePathKey, "endpoints.xml"));
+            Defaults(s => s.SetDefault(RoutingFilePathKey, "endpoints.xml"));
         }
 
         protected override void Setup(FeatureConfigurationContext context)
