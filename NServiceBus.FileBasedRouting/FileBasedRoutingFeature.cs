@@ -69,14 +69,15 @@ namespace NServiceBus.FileBasedRouting
 
             foreach (var endpoint in endpoints)
             {
+                var route = UnicastRoute.CreateFromEndpointName(endpoint.LogicalEndpointName);
                 foreach (var commandType in endpoint.Commands)
                 {
-                    commandRoutes.Add(new RouteTableEntry(commandType, UnicastRoute.CreateFromEndpointName(endpoint.LogicalEndpointName)));
+                    commandRoutes.Add(new RouteTableEntry(commandType, route));
                 }
 
                 foreach (var eventType in endpoint.Events)
                 {
-                    eventRoutes.Add(new RouteTableEntry(eventType, UnicastRoute.CreateFromEndpointName(endpoint.LogicalEndpointName)));
+                    eventRoutes.Add(new RouteTableEntry(eventType, route));
                 }
             }
 
