@@ -9,9 +9,12 @@ using NServiceBus.Transport;
 namespace NServiceBus.FileBasedRouting
 {
     using System.IO;
+    using Logging;
 
     class FileBasedRoutingFeature : Feature
     {
+        static ILog log = LogManager.GetLogger<FileBasedRoutingFeature>();
+
         public const string RoutingFilePathKey = "NServiceBus.FileBasedRouting.RoutingFilePath";
 
         public FileBasedRoutingFeature()
@@ -25,6 +28,8 @@ namespace NServiceBus.FileBasedRouting
 
         protected override void Setup(FeatureConfigurationContext context)
         {
+            var transportInfrastructure = context.Settings.Get<TransportInfrastructure>();
+
             var unicastRoutingTable = context.Settings.Get<UnicastRoutingTable>();
             var unicastSubscriberTable = context.Settings.Get<UnicastSubscriberTable>();
 
@@ -32,15 +37,17 @@ namespace NServiceBus.FileBasedRouting
             var routingFile = new XmlRoutingFileAccess(routingFilePath);
             var routingFileParser = new XmlRoutingFileParser();
 
-            // ensure the routing file is valid and the routing table is populated before running FeatureStartupTasks
-            UpdateRoutingTable(routingFileParser, routingFile, unicastRoutingTable, unicastSubscriberTable);
+            var nativeSends = transportInfrastructure.OutboundRoutingPolicy.Sends == OutboundRoutingType.Multicast;
+            var nativePublishes = transportInfrastructure.OutboundRoutingPolicy.Publishes == OutboundRoutingType.Multicast;
 
-            context.RegisterStartupTask(new UpdateRoutingTask(routingFileParser, routingFile, unicastRoutingTable, unicastSubscriberTable));
+            // ensure the routing file is valid and the routing table is populated before running FeatureStartupTasks
+            UpdateRoutingTable(routingFileParser, routingFile, unicastRoutingTable, unicastSubscriberTable, nativeSends, nativePublishes);
+
+            context.RegisterStartupTask(new UpdateRoutingTask(() => UpdateRoutingTable(routingFileParser, routingFile, unicastRoutingTable, unicastSubscriberTable, nativeSends, nativePublishes)));
 
             // if the transport provides native pub/sub support, don't plug in the FileBased pub/sub storage.
             if (context.Settings.Get<TransportInfrastructure>().OutboundRoutingPolicy.Publishes == OutboundRoutingType.Unicast)
             {
-                var transportInfrastructure = context.Settings.Get<TransportInfrastructure>();
                 var routingConnector = new PublishRoutingConnector(
                     unicastSubscriberTable,
                     context.Settings.Get<EndpointInstances>(),
@@ -60,7 +67,7 @@ namespace NServiceBus.FileBasedRouting
             return Path.IsPathRooted(configuredRoutingFilePath) ? configuredRoutingFilePath : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configuredRoutingFilePath);
         }
 
-        static void UpdateRoutingTable(XmlRoutingFileParser routingFileParser, XmlRoutingFileAccess routingFile, UnicastRoutingTable routingTable, UnicastSubscriberTable subscriberTable)
+        static void UpdateRoutingTable(XmlRoutingFileParser routingFileParser, XmlRoutingFileAccess routingFile, UnicastRoutingTable routingTable, UnicastSubscriberTable subscriberTable, bool nativeSends, bool nativePublishes)
         {
             var endpoints = routingFileParser.Parse(routingFile.Read());
 
@@ -72,11 +79,19 @@ namespace NServiceBus.FileBasedRouting
                 var route = UnicastRoute.CreateFromEndpointName(endpoint.LogicalEndpointName);
                 foreach (var commandType in endpoint.Commands)
                 {
+                    if (nativeSends)
+                    {
+                        log.Warn($"Selected transport uses native command routing. Route for {commandType.FullName} to {endpoint.LogicalEndpointName} configured in {routingFile.FilePath} will be ignored.");
+                    }
                     commandRoutes.Add(new RouteTableEntry(commandType, route));
                 }
 
                 foreach (var eventType in endpoint.Events)
                 {
+                    if (nativePublishes)
+                    {
+                        log.Warn($"Selected transport uses native event routing. Route for {eventType.FullName} to {endpoint.LogicalEndpointName} configured in {routingFile.FilePath} will be ignored.");
+                    }
                     eventRoutes.Add(new RouteTableEntry(eventType, route));
                 }
             }
@@ -87,23 +102,17 @@ namespace NServiceBus.FileBasedRouting
 
         class UpdateRoutingTask : FeatureStartupTask, IDisposable
         {
-            XmlRoutingFileParser routingFileParser;
-            XmlRoutingFileAccess routingFile;
-            UnicastRoutingTable unicastRoutingTable;
-            UnicastSubscriberTable subscriberTable;
+            Action updateRoutingCallback;
             Timer updateTimer;
 
-            public UpdateRoutingTask(XmlRoutingFileParser routingFileParser, XmlRoutingFileAccess routingFile, UnicastRoutingTable unicastRoutingTable, UnicastSubscriberTable subscriberTable)
+            public UpdateRoutingTask(Action updateRoutingCallback)
             {
-                this.routingFileParser = routingFileParser;
-                this.routingFile = routingFile;
-                this.unicastRoutingTable = unicastRoutingTable;
-                this.subscriberTable = subscriberTable;
+                this.updateRoutingCallback = updateRoutingCallback;
             }
 
             protected override Task OnStart(IMessageSession session)
             {
-                updateTimer = new Timer(state => UpdateRoutingTable(routingFileParser, routingFile, unicastRoutingTable, subscriberTable), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+                updateTimer = new Timer(state => updateRoutingCallback(), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
 
                 return Task.CompletedTask;
             }

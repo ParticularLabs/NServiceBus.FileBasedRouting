@@ -7,18 +7,18 @@
 
     public class XmlRoutingFileAccess
     {
-        readonly string filePath;
+        public string FilePath { get; }
 
         public XmlRoutingFileAccess(string filePath)
         {
-            this.filePath = filePath;
+            this.FilePath = filePath;
         }
 
         public XDocument Read()
         {
             try
             {
-                using (var fileStream = File.OpenRead(filePath))
+                using (var fileStream = File.OpenRead(FilePath))
                 {
                     return XDocument.Load(fileStream);
                 }
