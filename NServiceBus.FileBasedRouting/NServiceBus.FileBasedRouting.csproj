@@ -48,7 +48,7 @@
     <Compile Include="XmlRoutingFileAccess.cs" />
     <Compile Include="UnicastRouteGroup.cs" />
     <Compile Include="EndpointRoutingConfiguration.cs" />
-    <Compile Include="FileBasedRoutingConfig.cs" />
+    <Compile Include="FileBasedRoutingConfigExtensions.cs" />
     <Compile Include="FileBasedRoutingFeature.cs" />
     <Compile Include="PublishRoutingConnector.cs" />
     <Compile Include="UnicastSubscriberTable.cs" />

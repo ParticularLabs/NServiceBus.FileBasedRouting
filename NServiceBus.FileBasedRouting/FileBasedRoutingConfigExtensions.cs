@@ -2,7 +2,7 @@
 
 namespace NServiceBus.FileBasedRouting
 {
-    public static class FileBasedRoutingConfig
+    public static class FileBasedRoutingConfigExtensions
     {
         /// <summary>
         /// Enables routing configured with the routing configuration file.

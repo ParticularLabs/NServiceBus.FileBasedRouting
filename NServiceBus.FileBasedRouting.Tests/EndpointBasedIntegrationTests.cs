@@ -56,7 +56,7 @@ namespace NServiceBus.FileBasedRouting.Tests
 
                 var routeA = routing(typeof(A));
                 Assert.IsNull(routeA);
-                
+
                 var routeB = routing(typeof(B));
                 Assert.AreEqual(EndpointName, routeB.Endpoint);
             }
