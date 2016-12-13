@@ -5,13 +5,13 @@
     using System.Xml;
     using System.Xml.Linq;
 
-    public class XmlRoutingFileAccess
+    class XmlRoutingFileAccess
     {
         public string FilePath { get; }
 
         public XmlRoutingFileAccess(string filePath)
         {
-            this.FilePath = filePath;
+            FilePath = filePath;
         }
 
         public XDocument Read()

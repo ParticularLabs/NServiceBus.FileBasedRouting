@@ -19,7 +19,7 @@ namespace NServiceBus.FileBasedRouting
                 ? unicastRoutes
                 : emptyResult;
         }
-        
+
         public void AddOrReplaceRoutes(string sourceKey, IList<RouteTableEntry> entries)
         {
             // The algorithm uses ReaderWriterLockSlim. First entries are read. If then exists they are compared with passed entries and skipped if equal.
