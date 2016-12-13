@@ -8,7 +8,7 @@ using System.Xml.Schema;
 
 namespace NServiceBus.FileBasedRouting
 {
-    public class XmlRoutingFileParser
+    class XmlRoutingFileParser
     {
         public XmlRoutingFileParser()
         {

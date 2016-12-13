@@ -25,7 +25,7 @@ namespace EndpointA
             routingConfig.RegisterPublisher(typeof(DemoCommandReceived), "endpointB");
             routingConfig.InstanceMappingFile().FilePath("instance-mapping.xml");
 
-            endpointConfiguration.EnableFeature<FileBasedRoutingFeature>();
+            endpointConfiguration.EnableFileBasedRouting();
 
             var endpoint = await Endpoint.Start(endpointConfiguration);
 
