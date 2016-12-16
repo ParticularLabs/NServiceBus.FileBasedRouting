@@ -4,15 +4,21 @@ An alternative approach to configure message routing information and event subsc
 
 ## Configuration
 
-Enable the `FileBasedRouting` feature in the endpoint configuration:
+Enable the file-based routing via routing configuration:
 
-    endpointConfiguration.EnableFileBasedRouting();
+```
+var transport = endpointConfiguration.UseTransport<MsmqTransport>();
+var routing = transport.Routing();
+transport.Routing().UseFileBasedRouting();
+```
 
 This will configure the endpoint to look for a `endpoints.xml` file in the endpoints [base directory](https://msdn.microsoft.com/en-us/library/system.appdomain.basedirectory(v=vs.110).aspx).
 
 It is possible to configure a different relative or absolute file path, e.g.:
 
-    endpointConfiguration.EnableFileBasedRouting(@"C:\routingFile.xml");
+```
+transport.Routing().UseFileBasedRouting(@"..\..\..\endpoints.xml");
+```
     
 The routing file provides routing information like shown in the following example:
     
