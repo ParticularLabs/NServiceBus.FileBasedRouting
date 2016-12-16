@@ -18,8 +18,7 @@ namespace EndpointB
 
             var routingConfig = endpointConfiguration.UseTransport<MsmqTransport>().Routing();
             routingConfig.RegisterPublisher(typeof(DemoEvent), "endpointA");
-
-            endpointConfiguration.EnableFileBasedRouting();
+            routingConfig.UseFileBasedRouting();
 
             var endpoint = await Endpoint.Start(endpointConfiguration);
 

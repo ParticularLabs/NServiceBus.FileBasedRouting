@@ -2,15 +2,17 @@
 
 namespace NServiceBus.FileBasedRouting
 {
+    using Features;
+
     public static class FileBasedRoutingConfigExtensions
     {
         /// <summary>
         /// Enables routing configured with the routing configuration file.
         /// </summary>
         /// <param name="config">The configuration object.</param>
-        public static void EnableFileBasedRouting(this EndpointConfiguration config)
+        public static void UseFileBasedRouting(this RoutingSettings config)
         {
-            config.EnableFeature<FileBasedRoutingFeature>();
+            config.GetSettings().EnableFeatureByDefault<FileBasedRoutingFeature>();
         }
 
         /// <summary>
@@ -18,10 +20,10 @@ namespace NServiceBus.FileBasedRouting
         /// </summary>
         /// <param name="config">The configuration object.</param>
         /// <param name="configurationFilePath">The path to the configuration file.</param>
-        public static void EnableFileBasedRouting(this EndpointConfiguration config, string configurationFilePath)
+        public static void UseFileBasedRouting(this RoutingSettings config, string configurationFilePath)
         {
             config.GetSettings().Set(FileBasedRoutingFeature.RoutingFilePathKey, configurationFilePath);
-            config.EnableFeature<FileBasedRoutingFeature>();
+            config.GetSettings().EnableFeatureByDefault<FileBasedRoutingFeature>();
         }
     }
 }
