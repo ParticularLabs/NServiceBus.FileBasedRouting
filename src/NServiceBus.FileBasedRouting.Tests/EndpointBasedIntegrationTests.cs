@@ -67,15 +67,15 @@ namespace NServiceBus.FileBasedRouting.Tests
             var endpointConfiguration = new EndpointConfiguration("test");
             endpointConfiguration.UsePersistence<InMemoryPersistence>();
             endpointConfiguration.SendFailedMessagesTo("error");
-            endpointConfiguration.UseTransport<MsmqTransport>();
+            var routing = endpointConfiguration.UseTransport<MsmqTransport>().Routing();
 
             if (filePath == null)
             {
-                endpointConfiguration.EnableFileBasedRouting();
+                routing.UseFileBasedRouting();
             }
             else
             {
-                endpointConfiguration.EnableFileBasedRouting(filePath);
+                routing.UseFileBasedRouting(filePath);
             }
 
             await Endpoint.Create(endpointConfiguration); // to init all features
