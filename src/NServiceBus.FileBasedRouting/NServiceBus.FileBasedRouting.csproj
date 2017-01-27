@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UriHelper.cs" />
     <Compile Include="XmlRoutingFileAccess.cs" />
     <Compile Include="UnicastRouteGroup.cs" />
     <Compile Include="EndpointRoutingConfiguration.cs" />

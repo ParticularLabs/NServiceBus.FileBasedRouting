@@ -5,23 +5,21 @@ using System.Threading.Tasks;
 using NServiceBus.Features;
 using NServiceBus.Routing;
 using NServiceBus.Transport;
+using NServiceBus.Logging;
 
 namespace NServiceBus.FileBasedRouting
 {
-    using System.IO;
-    using Logging;
-
     class FileBasedRoutingFeature : Feature
     {
         static ILog log = LogManager.GetLogger<FileBasedRoutingFeature>();
 
-        public const string RoutingFilePathKey = "NServiceBus.FileBasedRouting.RoutingFilePath";
+        public const string RoutingFilePathKey = "NServiceBus.FileBasedRouting.RoutingFileUri";
 
         public FileBasedRoutingFeature()
         {
             Defaults(s=>
             {
-                s.SetDefault(RoutingFilePathKey, "endpoints.xml");
+                s.SetDefault(RoutingFilePathKey, UriHelper.FilePathToUri("endpoints.xml"));
                 s.SetDefault<UnicastSubscriberTable>(new UnicastSubscriberTable());
             });
         }
@@ -33,8 +31,8 @@ namespace NServiceBus.FileBasedRouting
             var unicastRoutingTable = context.Settings.Get<UnicastRoutingTable>();
             var unicastSubscriberTable = context.Settings.Get<UnicastSubscriberTable>();
 
-            var routingFilePath = GetRoutingFilePath(context);
-            var routingFile = new XmlRoutingFileAccess(routingFilePath);
+            var routingFileUri = context.Settings.Get<Uri>(RoutingFilePathKey);
+            var routingFile = new XmlRoutingFileAccess(routingFileUri);
             var routingFileParser = new XmlRoutingFileParser();
 
             var nativeSends = transportInfrastructure.OutboundRoutingPolicy.Sends == OutboundRoutingType.Multicast;
@@ -61,12 +59,6 @@ namespace NServiceBus.FileBasedRouting
             }
         }
 
-        static string GetRoutingFilePath(FeatureConfigurationContext context)
-        {
-            var configuredRoutingFilePath = context.Settings.Get<string>(RoutingFilePathKey);
-            return Path.IsPathRooted(configuredRoutingFilePath) ? configuredRoutingFilePath : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configuredRoutingFilePath);
-        }
-
         static void UpdateRoutingTable(XmlRoutingFileParser routingFileParser, XmlRoutingFileAccess routingFile, UnicastRoutingTable routingTable, UnicastSubscriberTable subscriberTable, bool nativeSends, bool nativePublishes)
         {
             var endpoints = routingFileParser.Parse(routingFile.Read());
@@ -81,7 +73,7 @@ namespace NServiceBus.FileBasedRouting
                 {
                     if (nativeSends)
                     {
-                        log.Warn($"Selected transport uses native command routing. Route for {commandType.FullName} to {endpoint.LogicalEndpointName} configured in {routingFile.FilePath} will be ignored.");
+                        log.Warn($"Selected transport uses native command routing. Route for {commandType.FullName} to {endpoint.LogicalEndpointName} configured in {routingFile.FileUri} will be ignored.");
                     }
                     commandRoutes.Add(new RouteTableEntry(commandType, route));
                 }
@@ -90,7 +82,7 @@ namespace NServiceBus.FileBasedRouting
                 {
                     if (nativePublishes)
                     {
-                        log.Warn($"Selected transport uses native event routing. Route for {eventType.FullName} to {endpoint.LogicalEndpointName} configured in {routingFile.FilePath} will be ignored.");
+                        log.Warn($"Selected transport uses native event routing. Route for {eventType.FullName} to {endpoint.LogicalEndpointName} configured in {routingFile.FileUri} will be ignored.");
                     }
                     eventRoutes.Add(new RouteTableEntry(eventType, route));
                 }

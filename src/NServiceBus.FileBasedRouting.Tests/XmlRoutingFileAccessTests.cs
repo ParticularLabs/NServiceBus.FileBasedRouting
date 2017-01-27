@@ -10,7 +10,7 @@
         [Test]
         public void Should_throw_when_file_not_found()
         {
-            var fileAccess = new XmlRoutingFileAccess("non-existing.file");
+            var fileAccess = new XmlRoutingFileAccess(new Uri("non-existing.file", UriKind.RelativeOrAbsolute));
 
             Assert.Throws<FileNotFoundException>(() => fileAccess.Read());
         }
@@ -19,7 +19,7 @@
         public void Should_return_loaded_document()
         {
             var fileName = "hello-world.xml";
-            var fileAccess = new XmlRoutingFileAccess(fileName);
+            var fileAccess = new XmlRoutingFileAccess(new Uri(fileName, UriKind.RelativeOrAbsolute));
 
             File.WriteAllText(fileName, "<greeting>Hello World!</greeting>");
             try
@@ -38,7 +38,7 @@
         public void Should_load_valid_xml_content()
         {
             var fileName = "hello-world.html";
-            var fileAccess = new XmlRoutingFileAccess(fileName);
+            var fileAccess = new XmlRoutingFileAccess(new Uri(fileName, UriKind.RelativeOrAbsolute));
 
             File.WriteAllText(fileName, "<h1>Hello World!</h1>");
             try
@@ -57,7 +57,7 @@
         public void Should_throw_when_file_contains_no_xml_content()
         {
             var fileName = "hello-world.txt";
-            var fileAccess = new XmlRoutingFileAccess(fileName);
+            var fileAccess = new XmlRoutingFileAccess(new Uri(fileName, UriKind.RelativeOrAbsolute));
 
             File.WriteAllText(fileName, "Hello World!");
             try

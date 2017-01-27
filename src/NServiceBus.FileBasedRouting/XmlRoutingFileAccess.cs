@@ -1,27 +1,23 @@
 ﻿namespace NServiceBus.FileBasedRouting
 {
     using System;
-    using System.IO;
     using System.Xml;
     using System.Xml.Linq;
 
     class XmlRoutingFileAccess
     {
-        public string FilePath { get; }
+        public Uri FileUri { get; }
 
-        public XmlRoutingFileAccess(string filePath)
+        public XmlRoutingFileAccess(Uri fileUri)
         {
-            FilePath = filePath;
+            FileUri = fileUri;
         }
 
         public XDocument Read()
         {
             try
             {
-                using (var fileStream = File.OpenRead(FilePath))
-                {
-                    return XDocument.Load(fileStream);
-                }
+                return XDocument.Load(FileUri.ToString());
             }
             catch (XmlException e)
             {
