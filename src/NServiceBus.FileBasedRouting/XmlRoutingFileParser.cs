@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using NServiceBus.Logging;
 
 namespace NServiceBus.FileBasedRouting
 {
@@ -12,6 +13,8 @@ namespace NServiceBus.FileBasedRouting
     {
         public XmlRoutingFileParser()
         {
+            logger = LogManager.GetLogger(typeof(XmlRoutingFileParser));
+
             using (var stream = GetType().Assembly.GetManifestResourceStream("NServiceBus.FileBasedRouting.routing.xsd"))
             using (var xmlReader = XmlReader.Create(stream))
             {
@@ -42,13 +45,14 @@ namespace NServiceBus.FileBasedRouting
             return configs;
         }
 
-        static IEnumerable<Type> GetAllMessageTypes(XElement endpointElement, string singular, string plural)
+        IEnumerable<Type> GetAllMessageTypes(XElement endpointElement, string singular, string plural)
         {
             var handles = endpointElement.Element("handles");
 
             var separatelyConfiguredCommands = handles
                 ?.Elements(singular)
                 .Select(e => SelectCommand(e.Attribute("type").Value))
+                .Where(e => e != null)
                 .ToArray() ?? Type.EmptyTypes;
 
             var filteredCommands = handles?.Elements(plural).SelectMany(SelectMessages) ?? Type.EmptyTypes;
@@ -56,9 +60,17 @@ namespace NServiceBus.FileBasedRouting
             return allCommands;
         }
 
-        static Type SelectCommand(string typeName)
+        Type SelectCommand(string typeName)
         {
-            return Type.GetType(typeName, true);
+            try
+            {
+                return Type.GetType(typeName, true);
+            }
+            catch
+            {
+                logger.Warn($"Could not find type {typeName}.");
+                return null;
+            }
         }
 
         static IEnumerable<Type> SelectMessages(XElement commandsElement)
@@ -81,6 +93,8 @@ namespace NServiceBus.FileBasedRouting
 
             return exportedTypes.Where(type => type.Namespace != null && type.Namespace.StartsWith(@namespace.Value));
         }
+
         readonly XmlSchemaSet schema;
+        readonly ILog logger;
     }
 }
