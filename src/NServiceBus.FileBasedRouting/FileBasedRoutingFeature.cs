@@ -14,12 +14,14 @@ namespace NServiceBus.FileBasedRouting
         static ILog log = LogManager.GetLogger<FileBasedRoutingFeature>();
 
         public const string RoutingFilePathKey = "NServiceBus.FileBasedRouting.RoutingFileUri";
+        public const string MonitorRouteFile = "NServiceBus.FileBasedRouting.MonitorRouteFile";
 
         public FileBasedRoutingFeature()
         {
-            Defaults(s=>
+            Defaults(s =>
             {
                 s.SetDefault(RoutingFilePathKey, UriHelper.FilePathToUri("endpoints.xml"));
+                s.SetDefault(MonitorRouteFile, true);
                 s.SetDefault<UnicastSubscriberTable>(new UnicastSubscriberTable());
             });
         }
@@ -31,6 +33,7 @@ namespace NServiceBus.FileBasedRouting
             var unicastRoutingTable = context.Settings.Get<UnicastRoutingTable>();
             var unicastSubscriberTable = context.Settings.Get<UnicastSubscriberTable>();
 
+            var monitorRouteFile = context.Settings.Get<bool>(MonitorRouteFile);
             var routingFileUri = context.Settings.Get<Uri>(RoutingFilePathKey);
             var routingFile = new XmlRoutingFileAccess(routingFileUri);
             var routingFileParser = new XmlRoutingFileParser();
@@ -41,7 +44,10 @@ namespace NServiceBus.FileBasedRouting
             // ensure the routing file is valid and the routing table is populated before running FeatureStartupTasks
             UpdateRoutingTable(routingFileParser, routingFile, unicastRoutingTable, unicastSubscriberTable, nativeSends, nativePublishes);
 
-            context.RegisterStartupTask(new UpdateRoutingTask(() => UpdateRoutingTable(routingFileParser, routingFile, unicastRoutingTable, unicastSubscriberTable, nativeSends, nativePublishes)));
+            if (monitorRouteFile)
+            {
+                context.RegisterStartupTask(new UpdateRoutingTask(() => UpdateRoutingTable(routingFileParser, routingFile, unicastRoutingTable, unicastSubscriberTable, nativeSends, nativePublishes)));
+            }
 
             // if the transport provides native pub/sub support, don't plug in the FileBased pub/sub storage.
             if (context.Settings.Get<TransportInfrastructure>().OutboundRoutingPolicy.Publishes == OutboundRoutingType.Unicast)
