@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using NServiceBus.Logging;
 
 namespace NServiceBus.FileBasedRouting
 {
@@ -48,7 +49,8 @@ namespace NServiceBus.FileBasedRouting
 
             var separatelyConfiguredCommands = handles
                 ?.Elements(singular)
-                .Select(e => SelectCommand(e.Attribute("type").Value))
+                .Select(e => FindMessageType(e.Attribute("type").Value))
+                .Where(e => e != null)
                 .ToArray() ?? Type.EmptyTypes;
 
             var filteredCommands = handles?.Elements(plural).SelectMany(SelectMessages) ?? Type.EmptyTypes;
@@ -56,9 +58,25 @@ namespace NServiceBus.FileBasedRouting
             return allCommands;
         }
 
-        static Type SelectCommand(string typeName)
+        static Type FindMessageType(string typeName)
         {
-            return Type.GetType(typeName, true);
+            Type msg = null;
+
+            try
+            {
+                msg = Type.GetType(typeName, true);
+            }
+            catch
+            {
+                //ignore
+            }
+
+            if (msg == null)
+            {
+                logger.Warn($"Cannot add route for unknown type {typeName}.");
+            }
+
+            return msg;
         }
 
         static IEnumerable<Type> SelectMessages(XElement commandsElement)
@@ -81,6 +99,8 @@ namespace NServiceBus.FileBasedRouting
 
             return exportedTypes.Where(type => type.Namespace != null && type.Namespace.StartsWith(@namespace.Value));
         }
+
         readonly XmlSchemaSet schema;
+        static readonly ILog logger = LogManager.GetLogger(typeof(XmlRoutingFileParser));
     }
 }
