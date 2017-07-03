@@ -51,7 +51,7 @@ namespace NServiceBus.FileBasedRouting
 
             var separatelyConfiguredCommands = handles
                 ?.Elements(singular)
-                .Select(e => SelectCommand(e.Attribute("type").Value))
+                .Select(e => FindMessageType(e.Attribute("type").Value))
                 .Where(e => e != null)
                 .ToArray() ?? Type.EmptyTypes;
 
@@ -60,17 +60,25 @@ namespace NServiceBus.FileBasedRouting
             return allCommands;
         }
 
-        Type SelectCommand(string typeName)
+        Type FindMessageType(string typeName)
         {
+            Type msg = null;
+
             try
             {
-                return Type.GetType(typeName, true);
+                msg = Type.GetType(typeName, true);
             }
             catch
             {
-                logger.Warn($"Could not find type {typeName}.");
-                return null;
+                //ignore
             }
+
+            if (msg == null)
+            {
+                logger.Warn($"Cannot add route for unknown type {typeName}.");
+            }
+
+            return msg;
         }
 
         static IEnumerable<Type> SelectMessages(XElement commandsElement)
