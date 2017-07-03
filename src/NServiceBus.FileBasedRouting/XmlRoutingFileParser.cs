@@ -13,8 +13,6 @@ namespace NServiceBus.FileBasedRouting
     {
         public XmlRoutingFileParser()
         {
-            logger = LogManager.GetLogger(typeof(XmlRoutingFileParser));
-
             using (var stream = GetType().Assembly.GetManifestResourceStream("NServiceBus.FileBasedRouting.routing.xsd"))
             using (var xmlReader = XmlReader.Create(stream))
             {
@@ -45,7 +43,7 @@ namespace NServiceBus.FileBasedRouting
             return configs;
         }
 
-        IEnumerable<Type> GetAllMessageTypes(XElement endpointElement, string singular, string plural)
+        static IEnumerable<Type> GetAllMessageTypes(XElement endpointElement, string singular, string plural)
         {
             var handles = endpointElement.Element("handles");
 
@@ -60,7 +58,7 @@ namespace NServiceBus.FileBasedRouting
             return allCommands;
         }
 
-        Type FindMessageType(string typeName)
+        static Type FindMessageType(string typeName)
         {
             Type msg = null;
 
@@ -103,6 +101,6 @@ namespace NServiceBus.FileBasedRouting
         }
 
         readonly XmlSchemaSet schema;
-        readonly ILog logger;
+        static readonly ILog logger = LogManager.GetLogger(typeof(XmlRoutingFileParser));
     }
 }
