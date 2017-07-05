@@ -14,14 +14,14 @@ namespace NServiceBus.FileBasedRouting
         static ILog log = LogManager.GetLogger<FileBasedRoutingFeature>();
 
         public const string RoutingFilePathKey = "NServiceBus.FileBasedRouting.RoutingFileUri";
-        public const string MonitorRouteFile = "NServiceBus.FileBasedRouting.MonitorRouteFile";
+        public const string RouteFileUpdateInterval = "NServiceBus.FileBasedRouting.RouteFileUpdateInterval";
 
         public FileBasedRoutingFeature()
         {
             Defaults(s =>
             {
                 s.SetDefault(RoutingFilePathKey, UriHelper.FilePathToUri("endpoints.xml"));
-                s.SetDefault(MonitorRouteFile, true);
+                s.SetDefault(RouteFileUpdateInterval, TimeSpan.FromSeconds(30));
                 s.SetDefault<UnicastSubscriberTable>(new UnicastSubscriberTable());
             });
         }
@@ -33,7 +33,7 @@ namespace NServiceBus.FileBasedRouting
             var unicastRoutingTable = context.Settings.Get<UnicastRoutingTable>();
             var unicastSubscriberTable = context.Settings.Get<UnicastSubscriberTable>();
 
-            var monitorRouteFile = context.Settings.Get<bool>(MonitorRouteFile);
+            var routeFileUpdateInterval = context.Settings.Get<TimeSpan>(RouteFileUpdateInterval);
             var routingFileUri = context.Settings.Get<Uri>(RoutingFilePathKey);
             var routingFile = new XmlRoutingFileAccess(routingFileUri);
             var routingFileParser = new XmlRoutingFileParser();
@@ -44,9 +44,9 @@ namespace NServiceBus.FileBasedRouting
             // ensure the routing file is valid and the routing table is populated before running FeatureStartupTasks
             UpdateRoutingTable(routingFileParser, routingFile, unicastRoutingTable, unicastSubscriberTable, nativeSends, nativePublishes);
 
-            if (monitorRouteFile)
+            if (routeFileUpdateInterval > TimeSpan.Zero)
             {
-                context.RegisterStartupTask(new UpdateRoutingTask(() => UpdateRoutingTable(routingFileParser, routingFile, unicastRoutingTable, unicastSubscriberTable, nativeSends, nativePublishes)));
+                context.RegisterStartupTask(new UpdateRoutingTask(() => UpdateRoutingTable(routingFileParser, routingFile, unicastRoutingTable, unicastSubscriberTable, nativeSends, nativePublishes), routeFileUpdateInterval));
             }
 
             // if the transport provides native pub/sub support, don't plug in the FileBased pub/sub storage.
@@ -101,16 +101,18 @@ namespace NServiceBus.FileBasedRouting
         class UpdateRoutingTask : FeatureStartupTask, IDisposable
         {
             Action updateRoutingCallback;
-            Timer updateTimer;
+	        TimeSpan routeFileUpdateInterval;
+	        Timer updateTimer;
 
-            public UpdateRoutingTask(Action updateRoutingCallback)
+            public UpdateRoutingTask(Action updateRoutingCallback, TimeSpan routeFileUpdateInterval)
             {
-                this.updateRoutingCallback = updateRoutingCallback;
+	            this.updateRoutingCallback = updateRoutingCallback;
+	            this.routeFileUpdateInterval = routeFileUpdateInterval;
             }
 
             protected override Task OnStart(IMessageSession session)
             {
-                updateTimer = new Timer(state => updateRoutingCallback(), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+                updateTimer = new Timer(state => updateRoutingCallback(), null, routeFileUpdateInterval, routeFileUpdateInterval);
 
                 return Task.CompletedTask;
             }
