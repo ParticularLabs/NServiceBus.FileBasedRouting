@@ -67,35 +67,45 @@ namespace NServiceBus.FileBasedRouting
 
         static void UpdateRoutingTable(XmlRoutingFileParser routingFileParser, XmlRoutingFileAccess routingFile, UnicastRoutingTable routingTable, UnicastSubscriberTable subscriberTable, bool nativeSends, bool nativePublishes)
         {
-            var endpoints = routingFileParser.Parse(routingFile.Read());
-
-            var commandRoutes = new List<RouteTableEntry>();
-            var eventRoutes = new List<RouteTableEntry>();
-
-            foreach (var endpoint in endpoints)
+            try
             {
-                var route = UnicastRoute.CreateFromEndpointName(endpoint.LogicalEndpointName);
-                foreach (var commandType in endpoint.Commands)
+                var endpoints = routingFileParser.Parse(routingFile.Read());
+
+                var commandRoutes = new List<RouteTableEntry>();
+                var eventRoutes = new List<RouteTableEntry>();
+
+                foreach (var endpoint in endpoints)
                 {
-                    if (nativeSends)
+                    var route = UnicastRoute.CreateFromEndpointName(endpoint.LogicalEndpointName);
+                    foreach (var commandType in endpoint.Commands)
                     {
-                        log.Warn($"Selected transport uses native command routing. Route for {commandType.FullName} to {endpoint.LogicalEndpointName} configured in {routingFile.FileUri} will be ignored.");
+                        if (nativeSends)
+                        {
+                            log.Warn($"Selected transport uses native command routing. Route for {commandType.FullName} to {endpoint.LogicalEndpointName} configured in {routingFile.FileUri} will be ignored.");
+                        }
+                        commandRoutes.Add(new RouteTableEntry(commandType, route));
                     }
-                    commandRoutes.Add(new RouteTableEntry(commandType, route));
+
+                    foreach (var eventType in endpoint.Events)
+                    {
+                        if (nativePublishes)
+                        {
+                            log.Warn($"Selected transport uses native event routing. Route for {eventType.FullName} to {endpoint.LogicalEndpointName} configured in {routingFile.FileUri} will be ignored.");
+                        }
+                        eventRoutes.Add(new RouteTableEntry(eventType, route));
+                    }
                 }
 
-                foreach (var eventType in endpoint.Events)
-                {
-                    if (nativePublishes)
-                    {
-                        log.Warn($"Selected transport uses native event routing. Route for {eventType.FullName} to {endpoint.LogicalEndpointName} configured in {routingFile.FileUri} will be ignored.");
-                    }
-                    eventRoutes.Add(new RouteTableEntry(eventType, route));
-                }
+                routingTable.AddOrReplaceRoutes("FileBasedRouting", commandRoutes);
+                subscriberTable.AddOrReplaceRoutes("FileBasedRouting", eventRoutes);
+
+                log.Debug($"Updated routing information from {routingFile.FileUri}");
             }
-
-            routingTable.AddOrReplaceRoutes("FileBasedRouting", commandRoutes);
-            subscriberTable.AddOrReplaceRoutes("FileBasedRouting", eventRoutes);
+            catch (Exception e)
+            {
+                log.Error($"Failed to update routing information from {routingFile.FileUri}. The last valid routing configuration will be used instead.", e);
+                throw;
+            }
         }
 
         class UpdateRoutingTask : FeatureStartupTask, IDisposable
@@ -112,7 +122,17 @@ namespace NServiceBus.FileBasedRouting
 
             protected override Task OnStart(IMessageSession session)
             {
-                updateTimer = new Timer(state => updateRoutingCallback(), null, routeFileUpdateInterval, routeFileUpdateInterval);
+                updateTimer = new Timer(state =>
+                {
+                    try
+                    {
+                        updateRoutingCallback();
+                    }
+                    catch (Exception)
+                    {
+                        // ignore exceptions to prevent endpoint crashes
+                    }
+                }, null, routeFileUpdateInterval, routeFileUpdateInterval);
 
                 return Task.CompletedTask;
             }
