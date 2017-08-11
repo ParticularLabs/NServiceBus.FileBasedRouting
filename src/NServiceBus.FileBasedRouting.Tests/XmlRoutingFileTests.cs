@@ -120,6 +120,25 @@ namespace NServiceBus.FileBasedRouting.Tests
             CollectionAssert.AreEquivalent(new[] { typeof(A), typeof(B) }, configuration.Commands);
         }
 
+        [Test]
+        public void It_does_not_throw_if_assembly_cannot_be_found()
+        {
+            const string xml = @"
+ <endpoints>
+  <endpoint name=""EndpointName"">
+    <handles>
+      <commands assembly = ""FooBar"" />
+    </handles>
+  </endpoint>
+ </endpoints>
+ ";
+            var configurations = GetConfigurations(xml);
+
+            Assert.AreEqual(1, configurations.Length);
+            var configuration = configurations[0];
+            Assert.AreEqual("EndpointName", configuration.LogicalEndpointName);
+        }
+
 
         static EndpointRoutingConfiguration[] GetConfigurations(string xml)
         {
