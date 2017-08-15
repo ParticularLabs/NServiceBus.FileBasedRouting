@@ -82,7 +82,17 @@ namespace NServiceBus.FileBasedRouting
         static IEnumerable<Type> SelectMessages(XElement commandsElement)
         {
             var assemblyName = commandsElement.Attribute("assembly").Value;
-            var assembly = Assembly.Load(assemblyName);
+            Assembly assembly;
+            try
+            {
+                assembly = Assembly.Load(assemblyName);
+            }
+            catch
+            {
+                logger.Warn($"Cannot add route for unknown assembly {assemblyName}.");
+                return Enumerable.Empty<Type>();
+            }
+            
             var exportedTypes = assembly.ExportedTypes;
             var @namespace = commandsElement.Attribute("namespace");
             if (@namespace == null)
