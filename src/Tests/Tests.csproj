@@ -4,14 +4,11 @@
     <TargetFrameworks>net452</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <Description>NServiceBus support for defining message routing via XML file</Description>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NServiceBus" Version="[7.0.0-*, 8.0.0)" />
+    <PackageReference Include="NServiceBus" Version="7.0.0-*" />
+    <PackageReference Include="NUnit" Version="3.*" />
+    <PackageReference Include="NServiceBus.Transport.Msmq" Version="1.0.0-*" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -20,8 +17,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="routing.xsd" />
+    <ProjectReference Include="..\Tests.Contracts\Tests.Contracts.csproj" />
+    <ProjectReference Include="..\NServiceBus.FileBasedRouting\NServiceBus.FileBasedRouting.csproj" />
   </ItemGroup>
 </Project>

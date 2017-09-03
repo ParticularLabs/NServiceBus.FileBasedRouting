@@ -134,7 +134,7 @@ namespace NServiceBus.FileBasedRouting
                     }
                 }, null, routeFileUpdateInterval, routeFileUpdateInterval);
 
-                return Task.CompletedTask;
+                return Task.FromResult(0);
             }
 
             protected override Task OnStop(IMessageSession session)
@@ -142,7 +142,7 @@ namespace NServiceBus.FileBasedRouting
                 updateTimer?.Dispose();
                 updateTimer = null;
 
-                return Task.CompletedTask;
+                return Task.FromResult(0);
             }
 
             public void Dispose()
