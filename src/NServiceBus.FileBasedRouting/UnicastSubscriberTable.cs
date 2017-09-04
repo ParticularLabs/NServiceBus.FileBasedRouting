@@ -14,8 +14,7 @@ namespace NServiceBus.FileBasedRouting
 
         public UnicastRouteGroup[] GetRoutesFor(Type messageType)
         {
-            UnicastRouteGroup[] unicastRoutes;
-            return routeTable.TryGetValue(messageType, out unicastRoutes)
+            return routeTable.TryGetValue(messageType, out var unicastRoutes)
                 ? unicastRoutes
                 : emptyResult;
         }
@@ -62,8 +61,7 @@ namespace NServiceBus.FileBasedRouting
             var newRouteTable = new Dictionary<Type, List<UnicastRoute>>();
             foreach (var entry in routeGroups.Values.SelectMany(g => g))
             {
-                List<UnicastRoute> typeRoutes;
-                if (!newRouteTable.TryGetValue(entry.MessageType, out typeRoutes))
+                if (!newRouteTable.TryGetValue(entry.MessageType, out var typeRoutes))
                 {
                     typeRoutes = new List<UnicastRoute>();
                     newRouteTable[entry.MessageType] = typeRoutes;

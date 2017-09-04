@@ -1,12 +1,9 @@
-﻿using EndpointB;
+﻿using System.Threading.Tasks;
 
-namespace EndpointB_2
+class Program
 {
-    class Program
+    static Task Main()
     {
-        static void Main(string[] args)
-        {
-            Configuration.Start("2").GetAwaiter().GetResult();
-        }
+       return Configuration.Start("2");
     }
 }
