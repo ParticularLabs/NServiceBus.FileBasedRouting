@@ -54,8 +54,7 @@ namespace NServiceBus.FileBasedRouting
                 .ToArray() ?? Type.EmptyTypes;
 
             var filteredCommands = handles?.Elements(plural).SelectMany(SelectMessages) ?? Type.EmptyTypes;
-            var allCommands = separatelyConfiguredCommands.Concat(filteredCommands).Distinct();
-            return allCommands;
+            return separatelyConfiguredCommands.Concat(filteredCommands).Distinct();
         }
 
         static Type FindMessageType(string typeName)
@@ -92,7 +91,7 @@ namespace NServiceBus.FileBasedRouting
                 logger.Warn($"Cannot add route for unknown assembly {assemblyName}.");
                 return Enumerable.Empty<Type>();
             }
-            
+
             var exportedTypes = assembly.ExportedTypes;
             var @namespace = commandsElement.Attribute("namespace");
             if (@namespace == null)
