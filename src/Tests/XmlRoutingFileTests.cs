@@ -1,9 +1,9 @@
 ﻿using System.Linq;
-using NServiceBus.FileBasedRouting.Tests.Contracts;
-using NServiceBus.FileBasedRouting.Tests.Contracts.Commands;
 using NUnit.Framework;
 using System.Xml.Linq;
 using NServiceBus.FileBasedRouting;
+using Tests.Contracts;
+using Tests.Contracts.Commands;
 
 public class XmlRoutingFileTests
 {
@@ -14,8 +14,8 @@ public class XmlRoutingFileTests
 <endpoints>
 <endpoint name=""EndpointName"">
 <handles>
-    <command type = ""NServiceBus.FileBasedRouting.Tests.Contracts.Commands.A, NServiceBus.FileBasedRouting.Tests.Contracts"" />
-    <command type = ""NServiceBus.FileBasedRouting.Tests.Contracts.Commands.B, NServiceBus.FileBasedRouting.Tests.Contracts"" />
+    <command type = ""Tests.Contracts.Commands.A, Tests.Contracts"" />
+    <command type = ""Tests.Contracts.Commands.B, Tests.Contracts"" />
 </handles>
 </endpoint>
 </endpoints>
@@ -36,7 +36,7 @@ public class XmlRoutingFileTests
 <endpoints>
 <endpoint name=""EndpointName"">
 <handles>
-    <commands assembly = ""NServiceBus.FileBasedRouting.Tests.Contracts"" />
+    <commands assembly = ""Tests.Contracts"" />
 </handles>
 </endpoint>
 </endpoints>
@@ -57,7 +57,7 @@ public class XmlRoutingFileTests
 <endpoints>
 <endpoint name=""EndpointName"">
 <handles>
-    <commands assembly = ""NServiceBus.FileBasedRouting.Tests.Contracts"" namespace=""NServiceBus.FileBasedRouting.Tests.Contracts.Commands"" />
+    <commands assembly = ""Tests.Contracts"" namespace=""Tests.Contracts.Commands"" />
 </handles>
 </endpoint>
 </endpoints>
@@ -78,7 +78,7 @@ public class XmlRoutingFileTests
 <endpoints>
 <endpoint name=""EndpointName"">
 <handles>
-    <commands assembly = ""NServiceBus.FileBasedRouting.Tests.Contracts"" namespace="""" />
+    <commands assembly = ""Tests.Contracts"" namespace="""" />
 </handles>
 </endpoint>
 </endpoints>
@@ -99,12 +99,12 @@ public class XmlRoutingFileTests
 <endpoints>
 <endpoint name=""EndpointName"">
 <handles>
-    <command type = ""NServiceBus.FileBasedRouting.Tests.Contracts.Commands.A, NServiceBus.FileBasedRouting.Tests.Contracts"" />
-    <command type = ""NServiceBus.FileBasedRouting.Tests.Contracts.Commands.A, NServiceBus.FileBasedRouting.Tests.Contracts"" />
-    <command type = ""NServiceBus.FileBasedRouting.Tests.Contracts.Commands.B, NServiceBus.FileBasedRouting.Tests.Contracts"" />
-    <command type = ""NServiceBus.FileBasedRouting.Tests.Contracts.Commands.B, NServiceBus.FileBasedRouting.Tests.Contracts"" />
-    <commands assembly = ""NServiceBus.FileBasedRouting.Tests.Contracts"" namespace=""NServiceBus.FileBasedRouting.Tests.Contracts.Commands"" />
-    <commands assembly = ""NServiceBus.FileBasedRouting.Tests.Contracts"" namespace=""NServiceBus.FileBasedRouting.Tests.Contracts.Commands"" />
+    <command type = ""Tests.Contracts.Commands.A, Tests.Contracts"" />
+    <command type = ""Tests.Contracts.Commands.A, Tests.Contracts"" />
+    <command type = ""Tests.Contracts.Commands.B, Tests.Contracts"" />
+    <command type = ""Tests.Contracts.Commands.B, Tests.Contracts"" />
+    <commands assembly = ""Tests.Contracts"" namespace=""Tests.Contracts.Commands"" />
+    <commands assembly = ""Tests.Contracts"" namespace=""Tests.Contracts.Commands"" />
 </handles>
 </endpoint>
 </endpoints>

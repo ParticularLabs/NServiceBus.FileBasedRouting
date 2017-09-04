@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using NServiceBus;
 using NServiceBus.Configuration.AdvancedExtensibility;
 using NServiceBus.FileBasedRouting;
-using NServiceBus.FileBasedRouting.Tests.Contracts.Commands;
 using NServiceBus.Routing;
 using NUnit.Framework;
+using Tests.Contracts.Commands;
 
 public class EndpointBasedIntegrationTests
 {
@@ -15,7 +15,7 @@ public class EndpointBasedIntegrationTests
 <endpoints>
 <endpoint name=""EndpointName"">
 <handles>
-    <command type = ""NServiceBus.FileBasedRouting.Tests.Contracts.Commands.A, NServiceBus.FileBasedRouting.Tests.Contracts"" />
+    <command type = ""Tests.Contracts.Commands.A, Tests.Contracts"" />
 </handles>
 </endpoint>
 </endpoints>
@@ -25,7 +25,7 @@ public class EndpointBasedIntegrationTests
 <endpoints>
 <endpoint name=""EndpointName"">
 <handles>
-    <command type = ""NServiceBus.FileBasedRouting.Tests.Contracts.Commands.B, NServiceBus.FileBasedRouting.Tests.Contracts"" />
+    <command type = ""Tests.Contracts.Commands.B, Tests.Contracts"" />
 </handles>
 </endpoint>
 </endpoints>

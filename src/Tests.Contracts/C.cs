@@ -1,4 +1,4 @@
-﻿namespace NServiceBus.FileBasedRouting.Tests.Contracts
+﻿namespace Tests.Contracts
 {
     public class C
     {
