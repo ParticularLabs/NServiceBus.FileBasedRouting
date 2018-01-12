@@ -10,7 +10,7 @@ static class Configuration
     {
         var endpointConfiguration = new EndpointConfiguration("endpointB");
         endpointConfiguration.MakeInstanceUniquelyAddressable(discriminator);
-
+        endpointConfiguration.EnableInstallers();
         endpointConfiguration.UsePersistence<InMemoryPersistence>();
         endpointConfiguration.SendFailedMessagesTo("error");
 

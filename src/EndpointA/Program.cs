@@ -10,7 +10,7 @@ class Program
     static async Task Main()
     {
         var endpointConfiguration = new EndpointConfiguration("endpointA");
-
+        endpointConfiguration.EnableInstallers();
         endpointConfiguration.UsePersistence<InMemoryPersistence>();
         endpointConfiguration.SendFailedMessagesTo("error");
 
