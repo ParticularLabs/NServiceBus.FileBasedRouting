@@ -67,9 +67,7 @@ public class EndpointBasedIntegrationTests
     static async Task<Func<Type, UnicastRoute>> GetRouting(string filePath)
     {
         var endpointConfiguration = new EndpointConfiguration("test");
-        endpointConfiguration.UsePersistence<InMemoryPersistence>();
-        endpointConfiguration.SendFailedMessagesTo("error");
-        var routing = endpointConfiguration.UseTransport<MsmqTransport>().Routing();
+        var routing = endpointConfiguration.UseTransport<LearningTransport>().Routing();
 
         if (filePath == null)
         {

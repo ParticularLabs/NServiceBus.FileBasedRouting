@@ -1,29 +1,32 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+VisualStudioVersion = 15.0.27130.2020
 MinimumVisualStudioVersion = 15.0.26430.12
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NServiceBus.FileBasedRouting", "NServiceBus.FileBasedRouting\NServiceBus.FileBasedRouting.csproj", "{B6417CA5-3892-4C53-8356-31018692AE35}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sample", "Sample", "{5C4D228C-9FF6-4F63-B413-68CC922EB652}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Contracts\Contracts.csproj", "{FB64C215-540A-4ED1-901F-1E0A242D0908}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Sample\Contracts\Contracts.csproj", "{FB64C215-540A-4ED1-901F-1E0A242D0908}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndpointA", "EndpointA\EndpointA.csproj", "{8B25A222-B70F-490C-8EF4-E8B788563176}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndpointA", "Sample\EndpointA\EndpointA.csproj", "{8B25A222-B70F-490C-8EF4-E8B788563176}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "EndpointB", "EndpointB\EndpointB.shproj", "{54093E78-EB7C-46E5-B495-3D6198EAFA5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndpointB_1", "Sample\EndpointB_1\EndpointB_1.csproj", "{EB4B2281-8C83-4BAB-B35B-A30C94B939FE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndpointB_1", "EndpointB_1\EndpointB_1.csproj", "{EB4B2281-8C83-4BAB-B35B-A30C94B939FE}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndpointB_2", "EndpointB_2\EndpointB_2.csproj", "{9B21E30F-61C0-4404-BB18-88CEBC69122C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndpointB_2", "Sample\EndpointB_2\EndpointB_2.csproj", "{9B21E30F-61C0-4404-BB18-88CEBC69122C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{01B5FB13-9952-4537-A340-42706EA66019}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.Contracts", "Tests.Contracts\Tests.Contracts.csproj", "{88F2D59F-CE5D-4BD5-B9EB-494A2728AD98}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{4238E063-B249-4935-B50D-177CB083FCED}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		..\GitVersion.yml = ..\GitVersion.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		EndpointB\EndpointB.projitems*{54093e78-eb7c-46e5-b495-3d6198eafa5c}*SharedItemsImports = 13
 		EndpointB\EndpointB.projitems*{9b21e30f-61c0-4404-bb18-88cebc69122c}*SharedItemsImports = 4
 		EndpointB\EndpointB.projitems*{eb4b2281-8c83-4bab-b35b-a30c94b939fe}*SharedItemsImports = 4
 	EndGlobalSection
@@ -67,7 +70,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{FB64C215-540A-4ED1-901F-1E0A242D0908} = {5C4D228C-9FF6-4F63-B413-68CC922EB652}
 		{8B25A222-B70F-490C-8EF4-E8B788563176} = {5C4D228C-9FF6-4F63-B413-68CC922EB652}
-		{54093E78-EB7C-46E5-B495-3D6198EAFA5C} = {5C4D228C-9FF6-4F63-B413-68CC922EB652}
 		{EB4B2281-8C83-4BAB-B35B-A30C94B939FE} = {5C4D228C-9FF6-4F63-B413-68CC922EB652}
 		{9B21E30F-61C0-4404-BB18-88CEBC69122C} = {5C4D228C-9FF6-4F63-B413-68CC922EB652}
 	EndGlobalSection

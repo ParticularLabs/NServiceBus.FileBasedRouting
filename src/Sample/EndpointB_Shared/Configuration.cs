@@ -10,12 +10,11 @@ static class Configuration
     {
         var endpointConfiguration = new EndpointConfiguration("endpointB");
         endpointConfiguration.MakeInstanceUniquelyAddressable(discriminator);
-
+        endpointConfiguration.EnableInstallers();
         endpointConfiguration.UsePersistence<InMemoryPersistence>();
         endpointConfiguration.SendFailedMessagesTo("error");
 
         var routingConfig = endpointConfiguration.UseTransport<MsmqTransport>().Routing();
-        routingConfig.RegisterPublisher(typeof(DemoEvent), "endpointA");
         routingConfig.UseFileBasedRouting();
 
         var endpoint = await Endpoint.Start(endpointConfiguration)

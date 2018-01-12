@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net452</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Contracts\Contracts.csproj" />
+    <ProjectReference Include="..\..\NServiceBus.FileBasedRouting\NServiceBus.FileBasedRouting.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NServiceBus.Transport.Msmq" Version="1.0.0-*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="endpoints.xml" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="instance-mapping.xml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
