@@ -6,9 +6,9 @@
     <AssemblyOriginatorKeyFile>$(SolutionDir)NServiceBus.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NServiceBus" Version="7.0.0-*" />
+    <PackageReference Include="NServiceBus" Version="7.0.0-beta0012" />
     <PackageReference Include="NUnit" Version="3.*" />
-    <PackageReference Include="NServiceBus.Transport.Msmq" Version="1.0.0-*" />
+    <PackageReference Include="NServiceBus.Transport.Msmq" Version="1.0.0-beta0006" />
     <ProjectReference Include="..\Tests.Contracts\Tests.Contracts.csproj" />
     <ProjectReference Include="..\NServiceBus.FileBasedRouting\NServiceBus.FileBasedRouting.csproj" />
   </ItemGroup>

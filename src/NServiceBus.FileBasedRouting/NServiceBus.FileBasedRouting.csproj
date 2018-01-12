@@ -11,7 +11,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="NServiceBus" Version="[7.0.0-*, 8.0.0)" />
+    <PackageReference Include="NServiceBus" Version="[7.0.0-beta0012, 8.0.0)" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="routing.xsd" />
