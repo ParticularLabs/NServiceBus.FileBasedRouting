@@ -15,7 +15,6 @@ class Program
         endpointConfiguration.SendFailedMessagesTo("error");
 
         var routingConfig = endpointConfiguration.UseTransport<MsmqTransport>().Routing();
-        routingConfig.RegisterPublisher(typeof(DemoCommandReceived), "endpointB");
         routingConfig.InstanceMappingFile().FilePath("instance-mapping.xml");
         routingConfig.UseFileBasedRouting();
 
