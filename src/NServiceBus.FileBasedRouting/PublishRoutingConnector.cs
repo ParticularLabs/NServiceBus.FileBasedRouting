@@ -26,7 +26,7 @@ namespace NServiceBus.FileBasedRouting
         public override async Task Invoke(IOutgoingPublishContext context, Func<IOutgoingLogicalMessageContext, Task> stage)
         {
             var eventType = context.Message.MessageType;
-            var routingStrategies = Route(eventType).ToList();
+            var routingStrategies = Route(eventType, context).ToList();
             if (routingStrategies.Count == 0)
             {
                 //No subscribers for this message.
@@ -45,14 +45,14 @@ namespace NServiceBus.FileBasedRouting
             }
         }
 
-        IEnumerable<UnicastRoutingStrategy> Route(Type messageType)
+        IEnumerable<UnicastRoutingStrategy> Route(Type messageType, IOutgoingPublishContext context)
         {
             var routes = routingTable.GetRoutesFor(messageType);
-            var selectedDestinations = SelectDestinationsForEachEndpoint(routes);
+            var selectedDestinations = SelectDestinationsForEachEndpoint(routes, context);
             return selectedDestinations.Select(destination => new UnicastRoutingStrategy(destination));
         }
 
-        HashSet<string> SelectDestinationsForEachEndpoint(IEnumerable<UnicastRouteGroup> routeGroups)
+        HashSet<string> SelectDestinationsForEachEndpoint(IEnumerable<UnicastRouteGroup> routeGroups, IOutgoingPublishContext context)
         {
             //Make sure we are sending only one to each transport destination. Might happen when there are multiple routing information sources.
             var addresses = new HashSet<string>();
@@ -73,7 +73,9 @@ namespace NServiceBus.FileBasedRouting
                 else
                 {
                     var candidates = group.Routes.SelectMany(ResolveRoute).ToArray();
-                    var selected = distributionPolicy.GetDistributionStrategy(group.EndpointName, DistributionStrategyScope.Publish).SelectReceiver(candidates);
+                    var distributionStrategy = distributionPolicy.GetDistributionStrategy(@group.EndpointName, DistributionStrategyScope.Publish);
+                    var distributionContext = new DistributionContext(candidates, context.Message, context.MessageId, context.Headers, resolveTransportAddress, context.Extensions);
+                    var selected = distributionStrategy.SelectDestination(distributionContext);
                     addresses.Add(selected);
                 }
             }
