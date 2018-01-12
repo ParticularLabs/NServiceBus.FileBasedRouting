@@ -15,9 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\EndpointB_Shared\*.cs" />
     <Content Include="..\EndpointA\endpoints.xml" CopyToOutputDirectory="Always" />
   </ItemGroup>
-
-  <Import Project="..\EndpointB\EndpointB.projitems" Label="Shared" />
 
 </Project>

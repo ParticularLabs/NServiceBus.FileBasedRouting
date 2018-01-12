@@ -11,8 +11,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Sample\Contrac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndpointA", "Sample\EndpointA\EndpointA.csproj", "{8B25A222-B70F-490C-8EF4-E8B788563176}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "EndpointB", "Sample\EndpointB\EndpointB.shproj", "{54093E78-EB7C-46E5-B495-3D6198EAFA5C}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndpointB_1", "Sample\EndpointB_1\EndpointB_1.csproj", "{EB4B2281-8C83-4BAB-B35B-A30C94B939FE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EndpointB_2", "Sample\EndpointB_2\EndpointB_2.csproj", "{9B21E30F-61C0-4404-BB18-88CEBC69122C}"
@@ -29,7 +27,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Sample\EndpointB\EndpointB.projitems*{54093e78-eb7c-46e5-b495-3d6198eafa5c}*SharedItemsImports = 13
 		EndpointB\EndpointB.projitems*{9b21e30f-61c0-4404-bb18-88cebc69122c}*SharedItemsImports = 4
 		EndpointB\EndpointB.projitems*{eb4b2281-8c83-4bab-b35b-a30c94b939fe}*SharedItemsImports = 4
 	EndGlobalSection
@@ -73,7 +70,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{FB64C215-540A-4ED1-901F-1E0A242D0908} = {5C4D228C-9FF6-4F63-B413-68CC922EB652}
 		{8B25A222-B70F-490C-8EF4-E8B788563176} = {5C4D228C-9FF6-4F63-B413-68CC922EB652}
-		{54093E78-EB7C-46E5-B495-3D6198EAFA5C} = {5C4D228C-9FF6-4F63-B413-68CC922EB652}
 		{EB4B2281-8C83-4BAB-B35B-A30C94B939FE} = {5C4D228C-9FF6-4F63-B413-68CC922EB652}
 		{9B21E30F-61C0-4404-BB18-88CEBC69122C} = {5C4D228C-9FF6-4F63-B413-68CC922EB652}
 	EndGlobalSection
