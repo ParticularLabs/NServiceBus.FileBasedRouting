@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
-    <ProjectReference Include="..\NServiceBus.FileBasedRouting\NServiceBus.FileBasedRouting.csproj" />
+    <ProjectReference Include="..\..\NServiceBus.FileBasedRouting\NServiceBus.FileBasedRouting.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,8 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="endpoints.xml" CopyToOutputDirectory="PreserveNewest" />
-    <None Update="instance-mapping.xml" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\EndpointA\endpoints.xml" CopyToOutputDirectory="Always" />
   </ItemGroup>
+
+  <Import Project="..\EndpointB\EndpointB.projitems" Label="Shared" />
 
 </Project>

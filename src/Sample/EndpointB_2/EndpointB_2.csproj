@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
-    <ProjectReference Include="..\NServiceBus.FileBasedRouting\NServiceBus.FileBasedRouting.csproj" />
+    <ProjectReference Include="..\..\NServiceBus.FileBasedRouting\NServiceBus.FileBasedRouting.csproj" />
   </ItemGroup>
 
   <ItemGroup>
