@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Description>NServiceBus support for defining message routing via XML file</Description>
+    <Description>NServiceBus support for defining message routing via XML files</Description>
   </PropertyGroup>
 
   <ItemGroup>
