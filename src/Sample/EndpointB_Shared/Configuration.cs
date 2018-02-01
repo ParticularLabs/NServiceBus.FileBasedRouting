@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Contracts.Events;
 using NServiceBus;
 using NServiceBus.FileBasedRouting;
 
