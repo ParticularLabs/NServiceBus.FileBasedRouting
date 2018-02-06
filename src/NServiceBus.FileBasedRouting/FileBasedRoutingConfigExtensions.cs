@@ -11,7 +11,7 @@ namespace NServiceBus.FileBasedRouting
         /// Enables routing configured with the routing configuration file.
         /// </summary>
         /// <param name="config">The configuration object.</param>
-        public static void UseFileBasedRouting(this RoutingSettings config)
+        public static FileBasedRoutingOptions UseFileBasedRouting(this RoutingSettings config)
         {
             config.GetSettings().EnableFeatureByDefault<FileBasedRoutingFeature>();
         }
