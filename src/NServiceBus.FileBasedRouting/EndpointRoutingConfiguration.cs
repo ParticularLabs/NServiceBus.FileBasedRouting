@@ -4,6 +4,8 @@ namespace NServiceBus.FileBasedRouting
 {
     class EndpointRoutingConfiguration
     {
+        public string Dennis { get; set; }
+
         public string LogicalEndpointName { get; set; }
 
         public Type[] Commands { get; set; }
