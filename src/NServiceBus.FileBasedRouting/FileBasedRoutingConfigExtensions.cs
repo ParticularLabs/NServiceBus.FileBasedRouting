@@ -13,7 +13,9 @@ namespace NServiceBus.FileBasedRouting
         /// <param name="config">The configuration object.</param>
         public static FileBasedRoutingOptions UseFileBasedRouting(this RoutingSettings config)
         {
-            config.GetSettings().EnableFeatureByDefault<FileBasedRoutingFeature>();
+            var settings = config.GetSettings();
+            settings.EnableFeatureByDefault<FileBasedRoutingFeature>();
+            return new FileBasedRoutingOptions(settings);
         }
 
         /// <summary>

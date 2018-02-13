@@ -1,24 +1,24 @@
 namespace NServiceBus.FileBasedRouting
 {
-    using System;
+    using Settings;
 
     /// <summary>
     /// Provides configuration options for FileBasedRouting feature
     /// </summary>
     public class FileBasedRoutingOptions
     {
-        /*/// <summary>
-        /// Enables registering observers to available probes.
+        SettingsHolder settings;
+        public FileBasedRoutingOptions(SettingsHolder settings)
+        {
+            this.settings = settings;
+        }
+
+        /// <summary>
+        /// Enables PubSub from code even when using file based routing.
         /// </summary>
-        public void RegisterObservers()
+        public void EnableMessageDrivenPubSub()
         {
+            settings.Set(FileBasedRoutingFeature.MessageDrivenPubSubEnabled, true);
         }
-
-        internal void SetUpObservers(ProbeContext probeContext)
-        {
-            registerObservers(probeContext);
-        }
-
-        Action<ProbeContext> registerObservers = c => { };*/
     }
 }
