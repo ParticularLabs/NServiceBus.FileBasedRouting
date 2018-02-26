@@ -14,11 +14,11 @@ namespace NServiceBus.FileBasedRouting
         }
 
         /// <summary>
-        /// Enables PubSub from code even when using file based routing.
+        /// Enables Subscriptions from code even when using file based routing.
         /// </summary>
-        public void EnableMessageDrivenPubSub()
+        public void EnableMessageDrivenSubscriptions()
         {
-            settings.Set(FileBasedRoutingFeature.MessageDrivenPubSubEnabled, true);
+            settings.Set(FileBasedRoutingFeature.MessageDrivenSubscriptionsEnabled, true);
         }
     }
 }

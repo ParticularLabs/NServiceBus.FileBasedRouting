@@ -15,7 +15,7 @@ namespace NServiceBus.FileBasedRouting
 
         public const string RoutingFilePathKey = "NServiceBus.FileBasedRouting.RoutingFileUri";
         public const string RouteFileUpdateInterval = "NServiceBus.FileBasedRouting.RouteFileUpdateInterval";
-        internal const string MessageDrivenPubSubEnabled = "NServiceBus.FileBasedRouting.MessageDrivenPubSubEnabled";
+        internal const string MessageDrivenSubscriptionsEnabled = "NServiceBus.FileBasedRouting.MessageDrivenSubscriptionsEnabled";
 
         public FileBasedRoutingFeature()
         {
@@ -23,7 +23,7 @@ namespace NServiceBus.FileBasedRouting
             {
                 s.SetDefault(RoutingFilePathKey, UriHelper.FilePathToUri("endpoints.xml"));
                 s.SetDefault(RouteFileUpdateInterval, TimeSpan.FromSeconds(30));
-                s.SetDefault(MessageDrivenPubSubEnabled, false);
+                s.SetDefault(MessageDrivenSubscriptionsEnabled, false);
                 s.SetDefault<UnicastSubscriberTable>(new UnicastSubscriberTable());
             });
         }
@@ -61,7 +61,7 @@ namespace NServiceBus.FileBasedRouting
                     instance => transportInfrastructure.ToTransportAddress(LogicalAddress.CreateRemoteAddress(instance)));
 
                 context.Pipeline.Replace("UnicastPublishRouterConnector", routingConnector);
-                if (!context.Settings.Get<bool>(MessageDrivenPubSubEnabled))
+                if (!context.Settings.Get<bool>(MessageDrivenSubscriptionsEnabled))
                 {
                     context.Pipeline.Replace("MessageDrivenSubscribeTerminator", new SubscribeTerminator(), "handles subscribe operations");
                     context.Pipeline.Replace("MessageDrivenUnsubscribeTerminator", new UnsubscribeTerminator(), "handles ubsubscribe operations");
