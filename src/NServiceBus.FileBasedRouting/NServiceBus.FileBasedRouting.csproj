@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileBasedRoutingOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UriHelper.cs" />
     <Compile Include="XmlRoutingFileAccess.cs" />
