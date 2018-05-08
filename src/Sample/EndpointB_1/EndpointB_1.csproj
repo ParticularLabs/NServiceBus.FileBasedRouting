@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="NServiceBus.Transport.Msmq" Version="1.0.0-rc0001" />
+    <PackageReference Include="NServiceBus.Transport.Msmq" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
