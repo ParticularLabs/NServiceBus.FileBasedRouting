@@ -10,7 +10,7 @@ namespace NServiceBus.FileBasedRouting
         protected override Task Terminate(ISubscribeContext context)
         {
             log.Debug($"Subscribe was called for {context.EventType.FullName}. With FileBasedRouting, subscribe operations have no effect and subscribers should be configured in the routing file. If subscribe was not called by you, consider disabling the {nameof(AutoSubscribe)} feature.");
-            return Task.CompletedTask;
+            return Task.FromResult(0);
         }
 
         static readonly ILog log = LogManager.GetLogger<FileBasedRoutingFeature>();

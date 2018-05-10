@@ -111,13 +111,13 @@ namespace NServiceBus.FileBasedRouting
         class UpdateRoutingTask : FeatureStartupTask, IDisposable
         {
             Action updateRoutingCallback;
-	        TimeSpan routeFileUpdateInterval;
-	        Timer updateTimer;
+            TimeSpan routeFileUpdateInterval;
+            Timer updateTimer;
 
             public UpdateRoutingTask(Action updateRoutingCallback, TimeSpan routeFileUpdateInterval)
             {
-	            this.updateRoutingCallback = updateRoutingCallback;
-	            this.routeFileUpdateInterval = routeFileUpdateInterval;
+                this.updateRoutingCallback = updateRoutingCallback;
+                this.routeFileUpdateInterval = routeFileUpdateInterval;
             }
 
             protected override Task OnStart(IMessageSession session)
@@ -134,7 +134,7 @@ namespace NServiceBus.FileBasedRouting
                     }
                 }, null, routeFileUpdateInterval, routeFileUpdateInterval);
 
-                return Task.CompletedTask;
+                return Task.FromResult(0);
             }
 
             protected override Task OnStop(IMessageSession session)
@@ -142,7 +142,7 @@ namespace NServiceBus.FileBasedRouting
                 updateTimer?.Dispose();
                 updateTimer = null;
 
-                return Task.CompletedTask;
+                return Task.FromResult(0);
             }
 
             public void Dispose()
