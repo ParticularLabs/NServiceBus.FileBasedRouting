@@ -1,10 +1,13 @@
-﻿using NServiceBus.Configuration.AdvanceExtensibility;
-using System;
+﻿using System;
 
 namespace NServiceBus.FileBasedRouting
 {
+    using Configuration.AdvancedExtensibility;
     using Features;
 
+    /// <summary>
+    /// Extensions to <see cref="RoutingSettings"/> to add file based routing functionality.
+    /// </summary>
     public static class FileBasedRoutingConfigExtensions
     {
         /// <summary>
