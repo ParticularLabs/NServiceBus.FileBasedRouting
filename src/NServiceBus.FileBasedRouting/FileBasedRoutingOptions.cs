@@ -8,6 +8,8 @@ namespace NServiceBus.FileBasedRouting
     public class FileBasedRoutingOptions
     {
         SettingsHolder settings;
+
+        /// <inheritdoc />
         public FileBasedRoutingOptions(SettingsHolder settings)
         {
             this.settings = settings;
