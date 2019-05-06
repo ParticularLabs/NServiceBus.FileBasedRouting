@@ -1,7 +1,7 @@
 # NServiceBus.FileBasedRouting
 An alternative approach to configure message routing information and event subscribers via XML file. The routing file can be configured once and then shared across all endpoints for easier routing and publish/subscribe management.
 
-
+CLA TEST 5
 ## Configuration
 
 Enable the file-based routing via routing configuration:
