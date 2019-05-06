@@ -92,4 +92,4 @@ In short: create a new xml file named `instance-mapping.xml` and include it on e
     <instance machine="machine2" />
   </endpoint>
 </endpoints>
-```
+```7
