@@ -1,14 +1,4 @@
----
-title: Centralized file-based routing
-summary: How NServiceBus message routing can be configured via a file that can be shared between all endpoints
-reviewed: 2020-07-29
-component: FileBasedRouting
-related:
-- nservicebus/messaging/routing-extensibility
-- nservicebus/messaging/routing
-- samples/routing/file-based-routing
----
-
+# Centralized file-based routing
 
 ## Concept 
 
@@ -19,30 +9,71 @@ Centralized file-based routing is an alternative approach to configure message r
 
 After installing the `NServiceBus.FileBasedRouting` package, enable the feature via the routing configuration:
 
-snippet: Enable
+```c#
+var transport = endpointConfiguration.UseTransport<MyTransport>();
+var routing = transport.Routing();
+routing.UseFileBasedRouting();
+```
 
 This will configure the endpoint to look for a `endpoints.xml` file in the endpoints [base directory](https://msdn.microsoft.com/en-us/library/system.appdomain.basedirectory.aspx).
 
 The routing file path can be configured using relative or absolute paths, e.g.:
 
-snippet: EnableCustomPath
+```c#
+var transport = endpointConfiguration.UseTransport<MyTransport>();
+var routing = transport.Routing();
+routing.UseFileBasedRouting(@"C:\routingFile.xml");
+```
 
 It is also possible to provide an Uri to the routing file (supporting `http[s]` and `file` protocols):
 
-snippet: EnableCustomUri
+```c#
+var transport = endpointConfiguration.UseTransport<MyTransport>();
+var routing = transport.Routing();
+routing.UseFileBasedRouting(new Uri("https://myserver/routing/endpoints.xml"));
+```
 
 The routing file provides routing information as is shown in the following example:
     
 Create a new XML file named `endpoints.xml` and include it on every endpoint using file based routing. 
 
-snippet: EndpointsByType
+```xml
+<!-- startcode EndpointsByType -->
+<endpoints>
+  <endpoint name="endpointA">
+    <handles>
+      <!-- Define that endpointA can handle the DemoCommand command -->
+      <command type="Contracts.Commands.DemoCommand, Contracts" />
+      <!-- Define that endpointA can handle the DemoEvent event -->
+      <event type="Contracts.Events.DemoEvent, Contracts" />
+    </handles>
+  </endpoint>
+  <endpoint name="endpointb">
+    <!-- ... -->
+  </endpoint>
+</endpoints>
+<!--endcode-->
+```
 
 The `type` attribute needs to provide the [Assembly Qualified Type Name](https://msdn.microsoft.com/en-us/library/system.type.assemblyqualifiedname.aspx).
 Make sure that the routing file is copied to the binaries output folder.
 
 Instead of defining every single message type, it's also possible to configure entire assemblies or namespaces in bulk:
 
-snippet: EndpointsByAssembly
+```xml
+<endpoints>
+  <endpoint name="endpointA">
+    <handles>
+      <!-- Define that endpointA can handle all commands in assembly "MyApp.Contracts" -->
+      <commands assembly="MyApp.Contracts" />
+      <!-- Define that endpointA can handle all events in assembly "MyApp.Contracts" within the namespace "Events" -->
+      <events assembly="MyApp.Contracts"
+              namespace="Events" />
+    </handles>
+  </endpoint>
+</endpoints>
+<!--endcode-->
+```
 
 
 ### Updating the routing configuration
