@@ -1,6 +1,8 @@
 # NServiceBus.FileBasedRouting
-An alternative approach to configure message routing information and event subscribers via XML file. The routing file can be configured once and then shared across all endpoints for easier routing and publish/subscribe management.
 
+NOTE: The `NServiceBus.FileBasedRouting` Preview has been retired and is archived. See all retired Previews [here](https://docs.particular.net/previews/#retired-previews).
+
+An alternative approach to configure message routing information and event subscribers via XML file. The routing file can be configured once and then shared across all endpoints for easier routing and publish/subscribe management.
 
 ## Configuration
 
